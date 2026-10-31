@@ -15,7 +15,7 @@ import type { ThemeTokenOverrides } from '@deepseek-ai/dsh-client-ui-theme/clien
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import { ensureAmbientScene, removeAmbientScene, ensurePageFades, removePageFades } from './critters.ts'
 import { attachFluidShader, SITE_FLUID_PARAMS, type FluidParams, type FluidShaderHandle } from './fluid-shader.ts'
-import { fluidToneColors, HUE_BASE } from './fluid-tones.ts'
+import { fluidToneColors } from './fluid-tones.ts'
 import { deleteVideoBlob, loadVideoBlob, loadVideoHandle } from './wallpaper-store.ts'
 import { attachFluidInteractions } from './fluid-interactions.ts'
 import { startSeamStamper } from './seam-stamper.ts'
@@ -812,12 +812,14 @@ export class AquaLayer {
     style.setProperty('--dsh-aqua-frost', String(Math.min(this.settings.frost / 50, 1.4)))
     // The new-session button's frost rides the same knob, +20 points.
     style.setProperty('--dsh-aqua-surface-frost', String(Math.min((this.settings.frost + 20) / 50, 1.4)))
-    // The cursor glow follows the fluid tone — same hue as the bloom stops,
-    // so 色调 320 glows the same cyan-blue as the water.
-    const glowHue = ((this.settings.fluidHue + HUE_BASE) % 360 + 360) % 360
+    // The cursor glow is a neutral white specular highlight: it no longer
+    // follows the fluid tone, so the 色调 slider recolors the water only and
+    // the glass always glows white. Light mode needs a heavier wash — the pane
+    // there is already white-on-white, so the dark-mode alpha would vanish
+    // into the frosted fill.
     style.setProperty('--dsh-aqua-spot-color', this.dark
-      ? `hsla(${glowHue}, 90%, 62%, 0.17)`
-      : `hsla(${glowHue}, 90%, 45%, 0.16)`)
+      ? 'rgba(255, 255, 255, 0.16)'
+      : 'rgba(255, 255, 255, 0.5)')
     style.setProperty('--dsh-aqua-wallpaper-blur', `${this.settings.wallpaperBlur}px`)
     style.setProperty('--dsh-aqua-wallpaper-frost', String(this.settings.wallpaperFrost / 100))
     // Video wallpaper: blur rides the video's own filter; brightness drives

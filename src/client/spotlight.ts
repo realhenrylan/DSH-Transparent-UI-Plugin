@@ -49,7 +49,7 @@ export const PRESS_ATTRIBUTE = 'data-dsh-aqua-press'
 const GLOW_RADIUS = 180
 
 /** Fallback glow color (the CSS var is normally provided by the stylesheet). */
-const GLOW_FALLBACK = 'rgba(90, 215, 255, 0.17)'
+const GLOW_FALLBACK = 'rgba(255, 255, 255, 0.16)'
 
 /** Tilt magnitude at the pane edge, radians (≈1° — perceptible but gentle). */
 const TILT_MAX = 0.0175

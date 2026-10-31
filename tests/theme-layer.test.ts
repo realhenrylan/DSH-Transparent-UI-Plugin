@@ -40,13 +40,13 @@ vi.mock('../src/client/wallpaper-store.ts', () => ({
 
 const disposers: Array<() => void> = []
 
-function createLayer(wallpaper: string): AquaLayer {
+function createLayer(wallpaper: string, colorScheme: 'dark' | 'light' = 'dark'): AquaLayer {
   localStorage.setItem('dsh.ui-aqua.background', 'wallpaper')
   localStorage.setItem('dsh.ui-aqua.wallpaper', wallpaper)
   localStorage.setItem('dsh.ui-aqua.whale', 'false')
   localStorage.setItem('dsh.ui-aqua.mesh', 'false')
   const context = {
-    theme: { getTheme: () => ({ active: { colorScheme: 'dark' } }), overrideTokens: () => () => {} },
+    theme: { getTheme: () => ({ active: { colorScheme } }), overrideTokens: () => () => {} },
     on: () => () => {},
     effect: (setup: () => (() => void) | void) => {
       const dispose = setup()
@@ -93,6 +93,17 @@ it('clamps color depth to the supported 0–100 range', () => {
   const layer = createLayer('')
   layer.setFluidDepth(200)
   expect(layer.getSettings().fluidDepth).toBe(100)
+})
+
+describe('cursor glow', () => {
+  it.each([
+    ['dark', 'rgba(255, 255, 255, 0.16)'],
+    ['light', 'rgba(255, 255, 255, 0.5)'],
+  ] as const)('paints a white highlight in %s mode', (scheme, expected) => {
+    const layer = createLayer('', scheme)
+    expect(layer.getDark()).toBe(scheme === 'dark')
+    expect(document.documentElement.style.getPropertyValue('--dsh-aqua-spot-color')).toBe(expected)
+  })
 })
 
 afterEach(() => {

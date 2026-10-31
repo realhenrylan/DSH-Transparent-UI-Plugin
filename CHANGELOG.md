@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Cursor glow: white specular highlight instead of the hue-tinted cyan; the 色调/hue slider now recolors the fluid water only.
+
 ## v1.4.2
 
 - Clamp restored color-depth values to the supported range.

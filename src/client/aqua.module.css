@@ -827,8 +827,8 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: -1;
-  /* The glow color follows the fluid tone: the layer writes
-     --dsh-aqua-spot-color on <html> from the 色调 slider. */
+  /* The glow is white: the layer writes --dsh-aqua-spot-color on <html>
+     (pure white, per-scheme alpha), independent of the 色调 slider. */
 }
 
 [data-dsh-aqua][data-dsh-aqua-spotlight] [data-dsh-aqua-spot][data-spot-on] [data-dsh-aqua-glow] {
