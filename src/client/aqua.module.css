@@ -34,6 +34,12 @@
   background: transparent;
 }
 
+/* Desktop paints an opaque base on the center column above the ambient layer.
+   Clear that host-owned fill in both appearance modes while Aqua is enabled. */
+[data-dsh-aqua] [data-dsh-frame] > [class*='centerCol'] {
+  background: transparent !important;
+}
+
 [data-dsh-aqua] [data-phase],
 [data-dsh-aqua] [data-dsh-details] {
   background: transparent;

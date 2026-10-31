@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-基于 [WYH66666666 的 Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) 适配 DSH 0.2.1-rc.5。仓库中的历史截图来自原版，界面细节可能随 DSH 版本变化。
+当前版本：**1.4.1**。基于 [WYH66666666 的 Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) 适配 DSH 0.2.1-rc.5。仓库中的历史截图来自原版，界面细节可能随 DSH 版本变化。
 
 Aqua 是一层高自由度的玻璃质感主题，套在 DeepSeek Harness 网页端。顶栏、侧边栏、输入框、统计行、轨迹视图都成了磨砂玻璃片,你还可以添加视频和图片作为背景。关掉开关就回到原生界面，不改 DSH 任何一行源码。
 

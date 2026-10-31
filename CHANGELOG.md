@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.4.1
+
+- Fix the opaque desktop center column hiding the fluid or wallpaper backdrop on DSH 0.2.1-rc.5; add regression coverage for Windows and macOS layouts.
+
 ## v1.4.0
 
 - Adapt the theme and its settings controls to DSH 0.2.1-rc.5; keep the master switch in General settings after the old plugin-card slot was removed.
