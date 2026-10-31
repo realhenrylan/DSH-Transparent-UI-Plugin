@@ -13,7 +13,7 @@ import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-cli
 // Type-only: pulls the `settings.general.item` SlotMap merge.
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import { fileToDataUrl, readFileAsDataUrl, Knob, Segmented } from './AquaControls.tsx'
-import { loadVideoHandle, saveVideoBlob, saveVideoHandle } from './wallpaper-store.ts'
+import { saveVideoBlob, saveVideoHandle } from './wallpaper-store.ts'
 import type { createAquaRowStore } from './settings-store.ts'
 import css from './AquaAppearanceRow.module.css'
 
@@ -55,8 +55,6 @@ export interface AquaAppearanceRowInjected {
   setVideoBlur: (value: number) => void
   /** Set the video wallpaper brightness, 0-100. */
   setVideoBrightness: (value: number) => void
-  /** Re-read the fsa: video after the user re-granted file access. */
-  authorizeVideo: () => void
 }
 
 /** Full component props: runtime share + store share + locale seat + injected face. */
@@ -73,7 +71,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
   const {
     t, setEnabled, setMode, setBlur, setFrost, setFluidHue, setFluidDepth, setBgBrightness,
     setBackground, setWallpaper, setWhale, setCritters, setMesh, setSpotlight, setPress,
-    setWallpaperBlur, setWallpaperFrost, setVideoBlur, setVideoBrightness, authorizeVideo, useStore,
+    setWallpaperBlur, setWallpaperFrost, setVideoBlur, setVideoBrightness, useStore,
   } = props
   const enabled = useStore(s => s.enabled)
   const mode = useStore(s => s.mode)
@@ -133,37 +131,6 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
       })()
     } else {
       videoRef.current?.click()
-    }
-  }
-
-  /** 选择视频 click: an fsa: video with stale permission re-authorizes in
-   *  one click (no picker); anything else opens the picker. */
-  const onChooseVideo = (): void => {
-    if (wallpaper.startsWith('fsa:')) {
-      void (async () => {
-        const handle = await loadVideoHandle()
-        if (handle !== null) {
-          try {
-            const permission = await handle.queryPermission({ mode: 'read' })
-            if (permission === 'granted') {
-              authorizeVideo()
-              return
-            }
-            if (permission === 'prompt') {
-              const next = await handle.requestPermission({ mode: 'read' })
-              if (next === 'granted') {
-                authorizeVideo()
-                return
-              }
-            }
-          } catch {
-            /* fall through to re-pick */
-          }
-        }
-        pickVideo()
-      })()
-    } else {
-      pickVideo()
     }
   }
 
@@ -290,7 +257,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
                   <button type="button" className={css.pickButton} onClick={() => { fileRef.current?.click() }}>
                     {t('aqua.chooseImage')}
                   </button>
-                  <button type="button" className={css.pickButton} onClick={onChooseVideo}>
+                  <button type="button" className={css.pickButton} onClick={pickVideo}>
                     {t('aqua.chooseVideo')}
                   </button>
                   {wallpaper !== '' && (

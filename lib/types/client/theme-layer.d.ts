@@ -137,9 +137,6 @@ export declare class AquaLayer {
     setVideoBlur(value: number): void;
     /** Set the video wallpaper brightness (0-100, 100 = fully lit). */
     setVideoBrightness(value: number): void;
-    /** After the user re-grants file access (选择视频 click on an fsa: video),
-     *  drop the mount guard and re-apply so the file is re-read and played. */
-    authorizeVideo(): void;
     private sync;
     /** Write the knob-driven CSS variables and mode attributes onto <html>. */
     private applySettings;

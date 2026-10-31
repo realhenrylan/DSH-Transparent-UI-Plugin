@@ -772,17 +772,6 @@ export class AquaLayer {
     if (this.enabled) this.applySettings()
   }
 
-  /** After the user re-grants file access (选择视频 click on an fsa: video),
-   *  drop the mount guard and re-apply so the file is re-read and played. */
-  authorizeVideo(): void {
-    if (this.videoObjectUrl !== undefined) {
-      URL.revokeObjectURL(this.videoObjectUrl)
-      this.videoObjectUrl = undefined
-    }
-    this.videoBlobId = undefined
-    if (this.enabled) this.applySettings()
-  }
-
   private sync(): void {
     if (this.enabled) this.mount()
     else this.unmount()

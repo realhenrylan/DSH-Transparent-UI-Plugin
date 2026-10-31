@@ -38,8 +38,6 @@ export interface AquaAppearanceRowInjected {
     setVideoBlur: (value: number) => void;
     /** Set the video wallpaper brightness, 0-100. */
     setVideoBrightness: (value: number) => void;
-    /** Re-read the fsa: video after the user re-granted file access. */
-    authorizeVideo: () => void;
 }
 /** Full component props: runtime share + store share + locale seat + injected face. */
 export type AquaAppearanceRowComponentProps = PropsRuntime<'settings.general.item'> & PropsStore<ReturnType<typeof createAquaRowStore>> & PropsLocale<'settings.aqua'> & AquaAppearanceRowInjected;

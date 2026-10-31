@@ -150,9 +150,6 @@ export function apply(ctx: ClientContext): void {
         layer.setVideoBrightness(videoBrightness)
         sync()
       },
-      authorizeVideo: () => {
-        layer.authorizeVideo()
-      },
     }
   }
 

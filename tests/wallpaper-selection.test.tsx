@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AquaAppearanceRow } from '../src/client/AquaAppearanceRow.tsx'
 import { zh } from '../src/client/locales.ts'
+import { loadVideoHandle } from '../src/client/wallpaper-store.ts'
 
 vi.mock('../src/client/AquaControls.tsx', async importOriginal => ({
   ...await importOriginal<typeof import('../src/client/AquaControls.tsx')>(),
@@ -67,6 +68,15 @@ describe('video selection when IndexedDB is unavailable', () => {
 })
 
 describe('video picker availability', () => {
+  it('can choose a different video when the saved file is already authorized', async () => {
+    vi.mocked(loadVideoHandle).mockResolvedValueOnce({ queryPermission: async () => 'granted' } as unknown as FileSystemFileHandle)
+    const picker = vi.fn(async () => [])
+    Object.defineProperty(window, 'showOpenFilePicker', { configurable: true, value: picker })
+    renderWallpaperRow('fsa:old-video.mp4')
+    fireEvent.click(screen.getByRole('button', { name: '选择视频' }))
+    await waitFor(() => expect(picker).toHaveBeenCalledOnce())
+  })
+
   it('opens the file input when the native picker is unavailable for this origin', async () => {
     Object.defineProperty(window, 'showOpenFilePicker', {
       configurable: true, value: vi.fn(async () => { throw new DOMException('Unavailable', 'SecurityError') }),

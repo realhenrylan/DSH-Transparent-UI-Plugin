@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Allow choosing a different video when the previous file is already authorized.
 - Ignore video wallpaper loads that finish after the theme or background has changed.
 
 - Restore video wallpaper playback after switching to the fluid background and back.
