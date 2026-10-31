@@ -611,10 +611,13 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
     0 8px 30px rgba(2, 6, 14, 0.32);
 }
 
-/* Collapsed: the floating rail reaches 12px into the chat gutter, so the
-   header card steps right (28px inset = 16px clear of the rail's edge) —
-   the sidebar keeps its geometry, the top bar does the adjusting. */
-[data-dsh-float] [data-dsh-frame][data-sidebar-collapsed] header {
+/* Collapsed, web build: the floating rail reaches 12px into the chat gutter,
+   so the header card steps right (28px inset = 16px clear of the rail's
+   edge) — the sidebar keeps its geometry, the top bar does the adjusting.
+   The Windows desktop has no rail to clear: the frame collapses the column to
+   a 0px track and the app paints its two controls into the titlebar band the
+   frame reserves above the grid, so the header keeps its stock inset. */
+[data-dsh-float]:not([data-windows-titlebar]) [data-dsh-frame][data-sidebar-collapsed] header {
   margin-left: 28px;
 }
 
@@ -624,37 +627,62 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
    than the open chat, so dark mode lifts the sampled backdrop slightly
    (brightness + a touch of saturation). That keeps the sidebar in the same
    water-lit register as the main pane without laying a flat veil over the
-   wallpaper. Light mode already sits at the canvas tone. ---------- */
+   wallpaper. Light mode already sits at the canvas tone.
+
+   The glass lives on ::before, not on the column itself — same recipe as the
+   composer card. Two reasons, both structural:
+   - `backdrop-filter` makes an element the backdrop root of everything it
+     contains, so popups rendered inside the column (the panel "more" menu,
+     the settings overlay) could only sample the column's own paint;
+   - it also makes the column the CONTAINING BLOCK of every `position: fixed`
+     descendant. DSH's Windows titlebar chrome is fixed: the collapse/expand
+     toggle sits at 12px and the new-session button at 48px of the reserved
+     40px titlebar band. They were re-anchored into this card instead of the
+     window strip — and once the column collapsed to a 0px track under
+     `overflow: hidden` they were clipped out of sight entirely (the vanishing
+     toggle). With no filter on the element, no containing block exists and
+     the chrome stays in the titlebar. ---------- */
 [data-dsh-float] [class*='sidebarCol'] {
   position: relative;
-  /* Above the header card (8): the settings panel is a fixed overlay
-     trapped in this stacking context, so the sidebar itself must outrank
-     the header or the panel's top edge sits under the top bar. */
+  /* Above the header card (8): the settings panel mounts INSIDE this column,
+     so the column's stacking context must outrank the top bar or the panel's
+     top edge sits under it. */
   z-index: 9;
   margin: 12px;
   padding: 10px 12px 14px;
   border: 1px solid rgba(19, 45, 83, 0.26);
   border-radius: 20px;
-  background: var(--dsh-aqua-glass-card-light);
-  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 10px 34px rgba(19, 45, 83, 0.16);
+  background: transparent;
+  box-shadow: 0 10px 34px rgba(19, 45, 83, 0.16);
+  backdrop-filter: none;
   overflow: hidden;
+}
+
+[data-dsh-float] [class*='sidebarCol']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--dsh-aqua-glass-card-light);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
 }
 
 [data-dsh-float] body[data-ds-dark-theme] [class*='sidebarCol'] {
   border-color: rgba(148, 180, 220, 0.32);
-  background: var(--dsh-aqua-glass-card-dark);
-  backdrop-filter: blur(var(--dsh-aqua-blur, 14px)) saturate(1.08) brightness(1.22);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 8px 30px rgba(2, 6, 14, 0.32);
+  box-shadow: 0 8px 30px rgba(2, 6, 14, 0.32);
 }
 
-/* Collapsed rail: floats too (mica mode). The rail keeps the app's own
-   geometry: the frame's grid track slides 256→56 (300ms) while the app
-   fades the frozen wide content out (150ms) — pinning a width here would
+[data-dsh-float] body[data-ds-dark-theme] [class*='sidebarCol']::before {
+  background: var(--dsh-aqua-glass-card-dark);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px)) saturate(1.08) brightness(1.22);
+}
+
+/* Collapsed rail (web build): floats too (mica mode). The rail keeps the
+   app's own geometry: the frame's grid track slides 256→56 (300ms) while the
+   app fades the frozen wide content out (150ms) — pinning a width here would
    clip the outgoing content instantly and hide that fade. The floating gap
    comes from a 12px left margin plus a matching negative right margin
    (outer size unchanged — the main column does not move; the rail just
@@ -662,16 +690,34 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
    aligning the rail with the header card's top and the composer's bottom.
    Padding must be zeroed explicitly: the expanded rule's 12px horizontal
    padding would otherwise shove the rail buttons out of the narrow column.
-   Compat mode has no data-dsh-float, so it keeps the stock rail untouched. */
-[data-dsh-float] [data-dsh-frame][data-sidebar-collapsed] [class*='sidebarCol'] {
+   Compat mode has no data-dsh-float, so it keeps the stock rail untouched.
+   Windows desktop draws no rail at all — the next rule takes over there. */
+[data-dsh-float]:not([data-windows-titlebar]) [data-dsh-frame][data-sidebar-collapsed] [class*='sidebarCol'] {
   margin: 12px -12px 12px 12px;
   padding: 0;
   border-radius: 16px;
   /* The right margin rides the same clock as the fade, so the rail eases
-     into its floating spot as the wide content dissolves. The transform
-     entry keeps the hover press smooth while collapsed (the collapsed rule
-     out-ranks the press transition, so it must carry transform too). */
-  transition: margin 150ms var(--ds-ease-in-out), border-radius 150ms var(--ds-ease-in-out), transform 0.1s ease-out;
+     into its floating spot as the wide content dissolves. */
+  transition: margin 150ms var(--ds-ease-in-out), border-radius 150ms var(--ds-ease-in-out);
+}
+
+/* Collapsed on Windows desktop: the frame collapses this column to a 0px
+   track and DSH paints the chrome controls straight into the 40px titlebar
+   band the frame reserves above the grid. There is no rail to dress, so the
+   card treatment is switched off wholesale — a surviving border, fill or
+   shadow would sit on the window edge as a hairline sliver, because a
+   zero-width grid track only zeroes the content box, never the card's ring. */
+[data-dsh-float][data-windows-titlebar] [data-dsh-frame][data-sidebar-collapsed] [class*='sidebarCol'] {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transition: none;
+}
+
+[data-dsh-float][data-windows-titlebar] [data-dsh-frame][data-sidebar-collapsed] [class*='sidebarCol']::before {
+  content: none;
 }
 
 /* The sidebar root freezes at the expanded column width via an inline
@@ -841,12 +887,10 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   border-radius: 24px;
 }
 
-/* While the settings dialog is open, the sidebar must not carry ANY
-   backdrop-filter: it re-anchors the dialog's fixed overlay into the column
-   (the panel traps at 254px instead of its 800px design). */
-[data-dsh-aqua][data-dsh-float] [class*='sidebarCol']:has([role='dialog']) {
-  backdrop-filter: none;
-}
+/* The settings overlay mounts inside the sidebar column; the column no longer
+   carries a backdrop-filter or a transform of its own (see the sidebar and
+   ::before rules above), so its fixed overlay anchors to the viewport and
+   needs no per-state un-trapping here. */
 
 /* ---------- Hover tilt: the geometric press is JS-driven (spotlight.ts
    writes `perspective(800px) rotateX/rotateY` inline, tracking the cursor —

@@ -60,6 +60,13 @@ const TILT_PERSPECTIVE = 800
 /** Ease-back settle time (ms) — must outlast the CSS transform transition. */
 const SETTLE_MS = 240
 
+/**
+ * The sidebar column (lightningcss keeps the class substring). It hosts the
+ * desktop titlebar chrome and the settings overlay, so it takes the glow but
+ * never the transform — see `tiltable`.
+ */
+const SIDEBAR_COLUMN = '[class*="sidebarCol"]'
+
 /** The glow is live only while its gate attribute is on <html>. */
 function glowGated(): boolean {
   return document.documentElement.hasAttribute(SPOTLIGHT_ATTRIBUTE)
@@ -78,11 +85,14 @@ function hoverGated(): boolean {
 /** Whether the tilt may run on this pane right now. */
 function tiltable(spot: HTMLElement): boolean {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
-  // The settings overlay renders INSIDE the sidebar column: tilting the
-  // sidebar while the panel is open would re-anchor its fixed overlay into
-  // the column — so the sidebar pauses while a dialog exists (the keeper
-  // untraps it instantly the moment the panel mounts).
-  if (spot.matches('[class*="sidebarCol"]') && document.querySelector('[role="dialog"]') !== null) return false
+  // The sidebar NEVER tilts. A transform is a containing block for every
+  // `position: fixed` descendant, and this column owns two such guests: the
+  // desktop titlebar chrome (collapse toggle at 12px, new session at 48px of
+  // the reserved titlebar band) and the settings overlay rendered inside the
+  // column. Pressing inside the sidebar would re-anchor both into the card —
+  // the panel traps at the column width and the titlebar buttons jump out of
+  // the window chrome. The glow is the only effect the sidebar takes part in.
+  if (spot.matches(SIDEBAR_COLUMN)) return false
   return true
 }
 
@@ -198,8 +208,7 @@ export function startSpotlight(): () => void {
         // magnitude there so the press stays gentle.
         const tiltMax = spot.hasAttribute('data-dsh-trajectory') ? TILT_MAX * 0.5 : TILT_MAX
         // Rotate about the visible glass center (spot-local, untransformed).
-        // Same recipe for every pane — the sidebar and its collapsed rail
-        // included.
+        // Same recipe for every tiltable pane (the sidebar is not one).
         spot.style.transformOrigin =
           `${local.left + local.width / 2}px ${local.top + local.height / 2}px`
         spot.style.transform =
@@ -226,7 +235,7 @@ export function startSpotlight(): () => void {
     if (spot === null) return
     // The settings overlay renders INSIDE the sidebar column: while it is
     // open, the sidebar stays out of every hover effect.
-    if (spot.matches('[class*="sidebarCol"]') && document.querySelector('[role="dialog"]') !== null) return
+    if (spot.matches(SIDEBAR_COLUMN) && document.querySelector('[role="dialog"]') !== null) return
     // Gutter/padding entries never start a session (and must not cancel a
     // pending ease-back settle), so the glass check comes first.
     const next = measure(spot)
@@ -255,14 +264,15 @@ export function startSpotlight(): () => void {
   // The glow divs live with the panes through React re-renders; DOM/layout
   // changes also refresh the active hover session (coalesced).
   const keeper = startOverlayKeeper(() => {
-    // The settings dialog mounts INSIDE the sidebar column — release the
-    // sidebar with a SNAP, not a glide: removing the inline transform while
-    // the CSS transition is live would keep the COMPUTED transform alive
-    // for ~0.1s and trap the panel's fixed overlay in the column for those
-    // frames (the "stuck in the sidebar for a moment" bug). Disabling the
-    // transition around the removal makes the release instant.
+    // The settings dialog mounts INSIDE the sidebar column. The sidebar never
+    // tilts (see `tiltable`), but a transform left behind by an earlier build,
+    // a hot reload or a race would trap the panel's fixed overlay in the
+    // column — so it is dropped with a SNAP, not a glide: removing the inline
+    // transform while the CSS transition is live would keep the COMPUTED
+    // transform alive for ~0.1s and re-trap the panel for those frames.
+    // Disabling the transition around the removal makes the release instant.
     for (const spot of spotElements()) {
-      if (!spot.matches('[class*="sidebarCol"]')) continue
+      if (!spot.matches(SIDEBAR_COLUMN)) continue
       if (spot.querySelector('[role="dialog"]') === null) continue
       spot.removeAttribute(ON_ATTR)
       const id = settle.get(spot)
