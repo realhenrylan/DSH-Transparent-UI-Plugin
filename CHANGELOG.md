@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Restore video wallpaper playback after switching to the fluid background and back.
+
 ## v1.4.1
 
 - Fix the opaque desktop center column hiding the fluid or wallpaper backdrop on DSH 0.2.1-rc.5; add regression coverage for Windows and macOS layouts.

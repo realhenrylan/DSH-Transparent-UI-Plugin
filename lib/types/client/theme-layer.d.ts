@@ -147,6 +147,8 @@ export declare class AquaLayer {
      *  element (not an iframe) keeps backdrop-filter working over it, so the
      *  glass panels stay frosted above the video. */
     private configureWallpaperVideo;
+    /** Reuse a cached file without restarting it on ordinary knob changes. */
+    private restoreCachedVideo;
     /** Apply the mode's token layer (floating palette, or translucent compat). */
     private applyTokens;
     private mount;

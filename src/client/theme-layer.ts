@@ -865,10 +865,7 @@ export class AquaLayer {
       if (this.settings.background === 'wallpaper' && isVideo) {
         if (wallpaper.startsWith('idb:')) {
           const id = wallpaper.slice(4)
-          if (this.videoBlobId === id && this.videoObjectUrl !== undefined) {
-            // Already mounted — never reload/revoke on repeated applySettings
-            // runs (knob tweaks would otherwise restart the video).
-          } else {
+          if (!this.restoreCachedVideo(video, id)) {
             void loadVideoBlob(id).then((blob) => {
               if (blob === null) return
               if (this.settings.wallpaper !== wallpaper) return // stale load
@@ -881,9 +878,7 @@ export class AquaLayer {
             })
           }
         } else if (wallpaper.startsWith('fsa:')) {
-          if (this.videoBlobId === wallpaper && this.videoObjectUrl !== undefined) {
-            // Already mounted — knob tweaks must not reload the file.
-          } else {
+          if (!this.restoreCachedVideo(video, wallpaper)) {
             void loadVideoHandle().then(async (handle) => {
               if (handle === null) return
               if (this.settings.wallpaper !== wallpaper) return // stale load
@@ -929,6 +924,18 @@ export class AquaLayer {
       video.muted = true
       void video.play().catch(() => { /* ignore */ })
     })
+  }
+
+  /** Reuse a cached file without restarting it on ordinary knob changes. */
+  private restoreCachedVideo(video: HTMLVideoElement, id: string): boolean {
+    if (this.videoBlobId !== id || this.videoObjectUrl === undefined) return false
+    // Switching to the fluid background clears the element's src but keeps the
+    // cached URL; restore it when the user switches back to the same video.
+    if (video.getAttribute('src') !== this.videoObjectUrl) {
+      video.setAttribute('src', this.videoObjectUrl)
+      this.configureWallpaperVideo(video)
+    }
+    return true
   }
 
   /** Apply the mode's token layer (floating palette, or translucent compat). */
