@@ -444,23 +444,39 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   border-radius: 24px;
 }
 
+/* The card's glass recipe lives on ::before, not on the card element. A
+   `backdrop-filter` on the card makes it the backdrop root for everything it
+   contains — and the "/" popup is inside it, so the popup's own blur could only
+   sample the card's empty interior and the transcript came through unblurred.
+   Same paint order, same tint, same blur knob, one level down. */
 [data-dsh-float] [data-composer-card] {
   position: relative;
   z-index: 8;
-  background: var(--dsh-aqua-glass-card-light);
+  background: transparent;
   border: 1px solid rgba(19, 45, 83, 0.26);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 10px 36px rgba(19, 45, 83, 0.16);
+  box-shadow: 0 10px 36px rgba(19, 45, 83, 0.16);
+  backdrop-filter: none;
+}
+
+[data-dsh-float] [data-composer-card]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--dsh-aqua-glass-card-light);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
 }
 
 [data-dsh-float] body[data-ds-dark-theme] [data-composer-card] {
-  background: var(--dsh-aqua-glass-card-dark);
   border: 1px solid rgba(148, 180, 220, 0.32);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 10px 36px rgba(2, 6, 14, 0.5);
+  box-shadow: 0 10px 36px rgba(2, 6, 14, 0.5);
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-composer-card]::before {
+  background: var(--dsh-aqua-glass-card-dark);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 /* Fused state: once the stats line is docked underneath, the WHOLE inputbar
@@ -468,27 +484,49 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
    the wrapper. The card and stats turn transparent inside it (their blur
    and tone can never drift apart again); only the hairline divider at the
    seam stays. The slab shrinks to its content width (max-content) so the
-   glass hugs the composer exactly. */
+   glass hugs the composer exactly. The glass itself sits on ::before here for
+   the same backdrop-root reason as the card above. */
 [data-dsh-aqua][data-dsh-float] [data-dsh-inputbar]:has([data-dsh-stats]) {
+  position: relative;
+  /* z-index, not isolation: a stacking context is all this needs (it keeps the
+     ::before glass above the in-flow transcript), while `isolation: isolate`
+     would also make the slab a backdrop root and blind the "/" popup's blur
+     in the fused state. */
+  z-index: 8;
   width: calc(var(--dsh-chat-content-width) + 32px);
   max-width: none;
   margin: 0 auto 12px;
   padding: 0;
   border: 1px solid rgba(19, 45, 83, 0.26);
   border-radius: 24px;
+  background: transparent;
+  box-shadow: 0 10px 36px rgba(19, 45, 83, 0.16);
+  backdrop-filter: none;
+}
+
+[data-dsh-aqua][data-dsh-float] [data-dsh-inputbar]:has([data-dsh-stats])::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   background: var(--dsh-aqua-glass-card-light);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 10px 36px rgba(19, 45, 83, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
 }
 
 [data-dsh-float] body[data-ds-dark-theme] [data-dsh-inputbar]:has([data-dsh-stats]) {
   border-color: rgba(148, 180, 220, 0.32);
+  box-shadow: 0 10px 36px rgba(2, 6, 14, 0.5);
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-dsh-inputbar]:has([data-dsh-stats])::before {
   background: var(--dsh-aqua-glass-card-dark);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 10px 36px rgba(2, 6, 14, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+[data-dsh-float] [data-dsh-inputbar]:has([data-dsh-stats]) [data-composer-card]::before {
+  display: none;
 }
 
 [data-dsh-float] [data-dsh-inputbar]:has([data-dsh-stats]) [data-composer-card] {
@@ -860,6 +898,44 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
    muddy and the blur scrambled its fixed-position layout. */
 [data-dsh-float] body[data-ds-dark-theme] [role='menu'] {
   background: color-mix(in srgb, rgb(28 32 42) calc(68% * var(--dsh-aqua-frost, 1)), transparent);
+}
+
+/* ---------- Popups INSIDE the composer card: the "/" command list, the
+   @ mention list and their sub-pickers. They mount in the card's own overlay
+   anchor (slot conversation.input.overlay, the card's first child), so they sit
+   behind everything the card paints — including its glass. The host gives them
+   their own wash (58% light / 45% dark) over a 40px blur, tuned for the stock
+   composer, an almost opaque pane.
+
+   The card's glass on ::before means the popup is no longer inside a backdrop
+   root, so its blur finally samples the real page. Give it the card's recipe
+   instead of a wash of its own: same tint, same blur knob, so "/" reads as the
+   same material as the composer it drops out of. The host's elevation, radius
+   and hairline stay. Popups anchored outside the card keep the stock wash. */
+[data-dsh-float] [data-composer-card] [data-menu-material='translucent'] {
+  --dsw-menu-surface-fill: var(--dsh-aqua-glass-card-light);
+  --dsw-menu-backdrop-filter: blur(var(--dsh-aqua-blur, 14px)) saturate(150%);
+  /* These two read the same fill for the list's bottom fade and its sticky
+     group headers; re-point them or those bands show up lighter than the
+     plate underneath. */
+  --dsw-specific-menu: var(--dsw-menu-surface-fill);
+  --dsw-alias-menu-group-header-fill: var(--dsh-aqua-glass-card-light);
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-composer-card] [data-menu-material='translucent'] {
+  --dsw-menu-surface-fill: var(--dsh-aqua-glass-card-dark);
+  --dsw-alias-menu-group-header-fill: var(--dsh-aqua-glass-card-dark);
+}
+
+/* Context menus opened from inside the card get the same glass; the generic
+   role=menu rule above is a 62% wash for the same reason as the stock token. */
+[data-dsh-float] [data-composer-card] [role='menu'] {
+  background: var(--dsh-aqua-glass-card-light);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-composer-card] [role='menu'] {
+  background: var(--dsh-aqua-glass-card-dark);
 }
 
 /* ---------- Page edge fades: 5px gradient blur bands pinned to the top and
