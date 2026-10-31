@@ -569,9 +569,13 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   margin-left: 28px;
 }
 
-/* ---------- Sidebar: header-style glass card. Light = neutral cool white
-   (no green cast) with a luminous right edge; dark keeps its green-teal
-   tint. ---------- */
+/* ---------- Sidebar: the same glass card as the header — one border
+   weight and one inset highlight all round (no separate luminous edge).
+   On a dark backdrop the large pane would otherwise read as a darker slab
+   than the open chat, so dark mode lifts the sampled backdrop slightly
+   (brightness + a touch of saturation). That keeps the sidebar in the same
+   water-lit register as the main pane without laying a flat veil over the
+   wallpaper. Light mode already sits at the canvas tone. ---------- */
 [data-dsh-float] [class*='sidebarCol'] {
   position: relative;
   /* Above the header card (8): the settings panel is a fixed overlay
@@ -581,7 +585,6 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   margin: 12px;
   padding: 10px 12px 14px;
   border: 1px solid rgba(19, 45, 83, 0.26);
-  border-right: 1px solid rgba(150, 190, 245, 0.65);
   border-radius: 20px;
   background: var(--dsh-aqua-glass-card-light);
   backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
@@ -593,8 +596,8 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
 
 [data-dsh-float] body[data-ds-dark-theme] [class*='sidebarCol'] {
   border-color: rgba(148, 180, 220, 0.32);
-  border-right: 1px solid rgba(148, 180, 220, 0.2);
   background: var(--dsh-aqua-glass-card-dark);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px)) saturate(1.08) brightness(1.22);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
     0 8px 30px rgba(2, 6, 14, 0.32);
