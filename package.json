@@ -1,7 +1,7 @@
 {
   "name": "dsh-aqua-glass-henry",
   "description": "Aqua glass theme adapted for DSH 0.2.1-rc.5 desktop and web",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "publishConfig": {
     "access": "public"
   },

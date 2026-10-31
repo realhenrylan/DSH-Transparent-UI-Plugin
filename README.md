@@ -2,7 +2,7 @@
 
 English | [中文](README.zh.md)
 
-Version **1.4.1**, adapted for DSH 0.2.1-rc.5 from [WYH66666666's Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin). The historical screenshots below show the original version; layout details can change with DSH.
+Version **1.4.2**, adapted for DSH 0.2.1-rc.5 from [WYH66666666's Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin). The historical screenshots below show the original version; layout details can change with DSH.
 
 
 Aqua is a highly customizable glassmorphism theme for the DeepSeek Harness web UI. The header, sidebar, composer, stats line, and trajectory view all become panes of frosted glass. you can put video for wallpaper and Switch it off and the stock UI comes back exactly, with no source changes to DSH itself.

@@ -1,13 +1,12 @@
 # Changelog
 
-## Unreleased
+## v1.4.2
 
 - Clamp restored color-depth values to the supported range.
 - Keep Windows transcript text below the floating header and title bar.
 - Synchronize controls, numeric settings, and mesh effects between windows.
 - Allow choosing a different video when the previous file is already authorized.
 - Ignore video wallpaper loads that finish after the theme or background has changed.
-
 - Restore video wallpaper playback after switching to the fluid background and back.
 - Preserve the video format when wallpaper storage falls back to a data URL.
 - Fall back to the standard video file picker if the native picker is unavailable, while respecting cancellation.
