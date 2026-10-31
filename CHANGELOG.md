@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Ignore video wallpaper loads that finish after the theme or background has changed.
+
 - Restore video wallpaper playback after switching to the fluid background and back.
 - Preserve the video format when wallpaper storage falls back to a data URL.
 - Fall back to the standard video file picker if the native picker is unavailable, while respecting cancellation.

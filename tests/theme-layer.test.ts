@@ -3,6 +3,7 @@ import { waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Context } from '@deepseek-ai/cordis'
 import { AquaLayer } from '../src/client/theme-layer.ts'
+import { loadVideoBlob, loadVideoHandle } from '../src/client/wallpaper-store.ts'
 
 vi.mock('../src/client/critters.ts', () => ({
   ensureAmbientScene: () => {
@@ -84,5 +85,28 @@ describe('video wallpaper', () => {
     expect(video.getAttribute('src')).toBeNull()
     layer.setBackground('wallpaper')
     expect(video.getAttribute('src')).toBe('blob:aqua-video')
+  })
+
+  it.each(['fluid', 'disable'])('ignores an IndexedDB load that finishes after %s', async action => {
+    let finish!: (blob: Blob) => void
+    vi.mocked(loadVideoBlob).mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    const layer = createLayer('idb:slow-video')
+    if (action === 'fluid') layer.setBackground('fluid')
+    else layer.setEnabled(false)
+    finish(new Blob(['video'], { type: 'video/mp4' }))
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(URL.createObjectURL).not.toHaveBeenCalled()
+  })
+
+  it('ignores a file handle load that finishes after the wallpaper is changed', async () => {
+    let finish!: (file: File) => void
+    const getFile = vi.fn(() => new Promise<File>(resolve => { finish = resolve }))
+    vi.mocked(loadVideoHandle).mockResolvedValueOnce({ queryPermission: async () => 'granted', getFile } as unknown as FileSystemFileHandle)
+    const layer = createLayer('fsa:slow-video.mp4')
+    await waitFor(() => expect(getFile).toHaveBeenCalledOnce())
+    layer.setWallpaper('data:image/png;base64,dGVzdA==')
+    finish(new File(['video'], 'slow-video.mp4', { type: 'video/mp4' }))
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(URL.createObjectURL).not.toHaveBeenCalled()
   })
 })

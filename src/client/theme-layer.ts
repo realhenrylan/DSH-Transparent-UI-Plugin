@@ -506,6 +506,8 @@ export class AquaLayer {
   private videoObjectUrl: string | undefined
   /** IndexedDB id backing the current object URL (guards against reloads). */
   private videoBlobId: string | undefined
+  /** Only the most recent asynchronous video load may update the element. */
+  private videoLoadId = 0
   private readonly ctx: Context
 
   /**
@@ -866,9 +868,9 @@ export class AquaLayer {
         if (wallpaper.startsWith('idb:')) {
           const id = wallpaper.slice(4)
           if (!this.restoreCachedVideo(video, id)) {
+            const loadId = ++this.videoLoadId
             void loadVideoBlob(id).then((blob) => {
-              if (blob === null) return
-              if (this.settings.wallpaper !== wallpaper) return // stale load
+              if (blob === null || !this.isCurrentVideoLoad(video, wallpaper, loadId)) return
               const url = URL.createObjectURL(blob)
               if (this.videoObjectUrl !== undefined) URL.revokeObjectURL(this.videoObjectUrl)
               this.videoObjectUrl = url
@@ -879,15 +881,16 @@ export class AquaLayer {
           }
         } else if (wallpaper.startsWith('fsa:')) {
           if (!this.restoreCachedVideo(video, wallpaper)) {
+            const loadId = ++this.videoLoadId
             void loadVideoHandle().then(async (handle) => {
-              if (handle === null) return
-              if (this.settings.wallpaper !== wallpaper) return // stale load
+              if (handle === null || !this.isCurrentVideoLoad(video, wallpaper, loadId)) return
               try {
                 // The browser remembers the file authorization; only a live
                 // grant lets us re-read the original file automatically.
                 const permission = await handle.queryPermission({ mode: 'read' })
-                if (permission !== 'granted') return // re-authorize on 选择视频 click
+                if (permission !== 'granted' || !this.isCurrentVideoLoad(video, wallpaper, loadId)) return
                 const file = await handle.getFile()
+                if (!this.isCurrentVideoLoad(video, wallpaper, loadId)) return
                 const url = URL.createObjectURL(file)
                 if (this.videoObjectUrl !== undefined) URL.revokeObjectURL(this.videoObjectUrl)
                 this.videoObjectUrl = url
@@ -909,6 +912,12 @@ export class AquaLayer {
         video.load()
       }
     }
+  }
+
+  /** Ignore loads superseded by a backdrop switch, replacement, or unmount. */
+  private isCurrentVideoLoad(video: HTMLVideoElement, wallpaper: string, loadId: number): boolean {
+    return this.videoLoadId === loadId && this.enabled && video.isConnected
+      && this.settings.background === 'wallpaper' && this.settings.wallpaper === wallpaper
   }
 
   /** The wallpaper plays as a plain <video> element (the browser's own

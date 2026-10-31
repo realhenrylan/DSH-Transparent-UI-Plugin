@@ -83,6 +83,8 @@ export declare class AquaLayer {
     private videoObjectUrl;
     /** IndexedDB id backing the current object URL (guards against reloads). */
     private videoBlobId;
+    /** Only the most recent asynchronous video load may update the element. */
+    private videoLoadId;
     private readonly ctx;
     /**
      * @param ctx - owning client context.
@@ -141,6 +143,8 @@ export declare class AquaLayer {
     private sync;
     /** Write the knob-driven CSS variables and mode attributes onto <html>. */
     private applySettings;
+    /** Ignore loads superseded by a backdrop switch, replacement, or unmount. */
+    private isCurrentVideoLoad;
     /** The wallpaper plays as a plain <video> element (the browser's own
      *  decoder, no player chrome at all): looping on, cover fill via CSS, and
      *  autoplay with a muted fallback where policy requires it. A direct
