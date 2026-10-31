@@ -57,3 +57,28 @@ describe('video selection when IndexedDB is unavailable', () => {
     await waitFor(() => expect(setWallpaper).toHaveBeenCalledWith('data:video/mp4;base64,dGVzdCB2aWRlbw=='))
   })
 })
+
+describe('video picker availability', () => {
+  it('opens the file input when the native picker is unavailable for this origin', async () => {
+    Object.defineProperty(window, 'showOpenFilePicker', {
+      configurable: true, value: vi.fn(async () => { throw new DOMException('Unavailable', 'SecurityError') }),
+    })
+    const { container } = renderWallpaperRow()
+    const input = container.querySelector<HTMLInputElement>('input[accept^="video/"]')!
+    const openInput = vi.spyOn(input, 'click').mockImplementation(() => {})
+    fireEvent.click(screen.getByRole('button', { name: '选择视频' }))
+    await waitFor(() => expect(openInput).toHaveBeenCalledOnce())
+  })
+
+  it('does not reopen the file picker when the user cancels', async () => {
+    const picker = vi.fn(async () => { throw new DOMException('Cancelled', 'AbortError') })
+    Object.defineProperty(window, 'showOpenFilePicker', { configurable: true, value: picker })
+    const { container } = renderWallpaperRow()
+    const input = container.querySelector<HTMLInputElement>('input[accept^="video/"]')!
+    const openInput = vi.spyOn(input, 'click').mockImplementation(() => {})
+    fireEvent.click(screen.getByRole('button', { name: '选择视频' }))
+    await waitFor(() => expect(picker).toHaveBeenCalledOnce())
+    await Promise.resolve()
+    expect(openInput).not.toHaveBeenCalled()
+  })
+})

@@ -124,8 +124,11 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
               else void readFileAsDataUrl(file).then(setWallpaper)
             })
           }
-        } catch {
-          /* picker cancelled — keep current state */
+        } catch (error) {
+          // Electron or browser policy may expose the API but reject it for
+          // this origin. A normal file input is still available in that case.
+          if (error instanceof DOMException && error.name === 'AbortError') return
+          videoRef.current?.click()
         }
       })()
     } else {
