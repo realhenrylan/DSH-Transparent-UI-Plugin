@@ -35,8 +35,13 @@ export const DEFAULT_ENABLED = true
 /** The layer's identity in the theme override stack (inspection-visible). */
 const OVERRIDE_SOURCE = 'dsh-aqua-glass-henry'
 
-const FONT_STACK = "'Space Grotesk Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', "
-  + "'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+/* Unified UI face: Space Grotesk for Latin/digits, the host system stack for
+ * CJK (Microsoft YaHei on Windows, PingFang on macOS). CSS font fallback is
+ * per glyph, so one stack covers both scripts — no separate language
+ * selectors. The stacks themselves live in aqua.module.css as
+ * `--dsh-aqua-font-ui` / `--dsh-aqua-font-display`, the single source shared
+ * by the body rule, the display rules and these token overrides. Code stays
+ * on the host's own monospace stack. */
 
 /** Scheme-invariant override value (applied to both palettes). */
 const both = (value: string): { light: string; dark: string } => ({ light: value, dark: value })
@@ -47,8 +52,13 @@ const both = (value: string): { light: string; dark: string } => ({ light: value
  * the Appearance preference — dark is deep-sea navy, light is cool white-blue.
  */
 export const AQUA_TOKEN_OVERRIDES: ThemeTokenOverrides = {
-  // Typography: Space Grotesk for Latin/digits, CJK keeps the system stack.
-  '--dsw-font-family': both(FONT_STACK),
+  // Typography: Space Grotesk for Latin/digits, host system CJK for body
+  // text, brand and document-preview surfaces. Display headings keep their
+  // own serif CJK stack; code blocks stay on the host monospace stack.
+  '--dsw-font-family': both('var(--dsh-aqua-font-ui)'),
+  '--dsw-font-family-brand': both('var(--dsh-aqua-font-ui)'),
+  '--dsw-font': both('var(--dsh-aqua-font-ui)'),
+  '--dsh-font-family-text-default': both('var(--dsh-aqua-font-ui)'),
 
   // Backgrounds.
   '--dsw-alias-bg-base': { light: '#F4F8FD', dark: '#0C121B' },

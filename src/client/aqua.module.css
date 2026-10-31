@@ -13,6 +13,11 @@
    the frame —lift them too, or the glow never reaches the eye. ---------- */
 [data-dsh-aqua] body {
   background: var(--dsw-alias-bg-base);
+  /* Unified type: Latin/digits resolve to Space Grotesk, CJK to the host
+     system stack (Microsoft YaHei on Windows). Font fallback is per glyph,
+     so a mixed Chinese/English string renders in both faces without
+     language-specific selectors. Code surfaces keep the host monospace. */
+  font-family: var(--dsh-aqua-font-ui);
 }
 
 /* ---------- Knobs: the settings row writes --dsh-aqua-blur (px),
@@ -22,6 +27,12 @@
    step; the smaller surfaces (stats / bubble / menu / + button) keep their
    own base alphas and only scale by the same frost multiplier. ---------- */
 [data-dsh-aqua] {
+  /* The theme token layer points --dsw-font-family, the brand stack and the
+     document-preview stack here, so every host surface that consumes those
+     tokens gets the same typography as the body rule above. Display
+     headings keep the original serif CJK stack (Noto Serif SC here). */
+  --dsh-aqua-font-ui: 'Space Grotesk Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --dsh-aqua-font-display: 'Space Grotesk Variable', 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
   /* FLAT glass: one even tone per scheme (no vertical gradient — a darker
      bottom stop read as a black fade inside the composer). */
   --dsh-aqua-glass-card-light: color-mix(in srgb, rgb(255 255 255) calc(42% * var(--dsh-aqua-frost, 1)), transparent);
@@ -665,6 +676,43 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   background: transparent;
 }
 
+/* ---------- Scheduled tasks: the second main panel. The stock page paints
+   an opaque base across the whole center column, and its detail column plus
+   save footer paint the same base again — so the fluid never reaches this
+   view. Make the page a floating glass card on the trajectory recipe, then
+   clear those page-level fills. Inputs and task cards keep their own
+   surfaces for readability. ---------- */
+[data-dsh-float] [data-testid='task-manager-page'] {
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  height: calc(100% - 20px);
+  margin: 8px 16px 12px;
+  border: 1px solid rgba(19, 45, 83, 0.26);
+  border-radius: 20px;
+  background: var(--dsh-aqua-glass-card-light);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 10px 34px rgba(19, 45, 83, 0.16);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
+  overflow: hidden;
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-testid='task-manager-page'] {
+  border-color: rgba(148, 180, 220, 0.32);
+  background: var(--dsh-aqua-glass-card-dark);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 30px rgba(2, 6, 14, 0.32);
+}
+
+[data-dsh-float] [data-testid='task-manager-page'] :is(
+  [class*='_detail'],
+  [class*='_saveFooter'],
+  [class*='_saveFailure']
+) {
+  background: transparent;
+}
+
 /* ---------- Stats line: the composer card's docked footer (original
    styling). It shares the card's glass blur/width/border; the distinction
    is a hairline divider at the seam plus a slightly more transparent
@@ -861,7 +909,7 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   background: rgba(110, 155, 232, 0.35);
 }
 
-/* ---------- Display typography: the serif face marks headings and the
+/* ---------- Display typography: the serif CJK face marks headings and the
    session tree, so the page reads in two voices —serif headings over the
    sans body. Space Grotesk keeps Latin/digits in the same stack. ---------- */
 
@@ -877,13 +925,13 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
 }
 
 [data-dsh-float] [role='dialog'] h2 {
-  font-family: 'Space Grotesk Variable', 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  font-family: var(--dsh-aqua-font-display);
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
 [data-dsh-float] [role='treeitem'] {
-  font-family: 'Space Grotesk Variable', 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  font-family: var(--dsh-aqua-font-display);
   font-weight: 500;
 }
 

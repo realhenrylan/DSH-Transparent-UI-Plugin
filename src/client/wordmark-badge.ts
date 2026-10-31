@@ -13,7 +13,8 @@
 /** Pill recipe from the official site (`bg-black/25 text-white/95 …`). */
 const PILL_BG = 'rgba(0, 0, 0, 0.25)'
 const PILL_INK = 'rgba(255, 255, 255, 0.95)'
-const MONO_STACK = "ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace"
+/** Same Latin face as the rest of the layer (the pill is English-only). */
+const BADGE_FONT_STACK = "'Space Grotesk Variable', 'Microsoft YaHei', 'PingFang SC', sans-serif"
 /** Official gloss ring: 135° white gradient at 1px padding + soft glow. */
 const RING_GRADIENT = 'linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.08) 35%, rgba(255,255,255,0.04) 65%, rgba(255,255,255,0.5) 100%)'
 
@@ -112,7 +113,7 @@ export function startWordmarkBadge(dark: boolean): BadgeHandle {
           `border-radius:${Math.round(4 * scaleY * 10) / 10}px`,
           `background:${PILL_BG}`,
           `color:${PILL_INK}`,
-          `font-family:${MONO_STACK}`,
+          `font-family:${BADGE_FONT_STACK}`,
           `font-size:${Math.round(7.5 * scaleY * 10) / 10}px`,
           'font-weight:500',
           'line-height:1',
