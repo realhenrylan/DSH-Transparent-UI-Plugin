@@ -294,7 +294,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
                     {t('aqua.chooseVideo')}
                   </button>
                   {wallpaper !== '' && (
-                    <button type="button" className={css.deleteButton} onClick={() => { setWallpaper('') }}>
+                    <button type="button" className={css.deleteButton} onClick={() => { setWallpaper(''); setBackground('fluid') }}>
                       {t('aqua.deleteWallpaper')}
                     </button>
                   )}
