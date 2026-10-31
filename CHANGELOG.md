@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Separate light and dark wallpapers: each scheme keeps its own wallpaper (image or video) with its own blur/frost/brightness knobs, and switching Appearance swaps the backdrop live; a scheme without a wallpaper falls back to the fluid board, and the existing wallpaper is seeded into both schemes once, so nothing changes visually until you set them apart.
 - Cursor glow: white specular highlight instead of the hue-tinted cyan; the 色调/hue slider now recolors the fluid water only.
 
 ## v1.4.2

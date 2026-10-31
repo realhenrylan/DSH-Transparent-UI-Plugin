@@ -1,5 +1,6 @@
 import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots';
 import type { createAquaRowStore } from './settings-store.ts';
+import type { AquaScheme } from './theme-layer.ts';
 /** Injected business face for the master switch and every knob. */
 export interface AquaAppearanceRowInjected {
     /** Switch the glass layer on or off. */
@@ -18,8 +19,8 @@ export interface AquaAppearanceRowInjected {
     setBgBrightness: (value: number) => void;
     /** Set the backdrop source. */
     setBackground: (value: 'fluid' | 'wallpaper') => void;
-    /** Set the wallpaper image (a data URL). */
-    setWallpaper: (value: string) => void;
+    /** Set a scheme's wallpaper image (a data URL, `idb:` blob, or `fsa:` handle). */
+    setWallpaper: (value: string, scheme?: AquaScheme) => void;
     /** Set the particle-whale flag. */
     setWhale: (value: boolean) => void;
     /** Set the ambient marine-life flag. */
@@ -30,14 +31,14 @@ export interface AquaAppearanceRowInjected {
     setSpotlight: (value: boolean) => void;
     /** Set the hover-press flag. */
     setPress: (value: boolean) => void;
-    /** Set the wallpaper blur radius, px. */
-    setWallpaperBlur: (value: number) => void;
-    /** Set the wallpaper frost veil, 0-100. */
-    setWallpaperFrost: (value: number) => void;
-    /** Set the video wallpaper blur radius, px. */
-    setVideoBlur: (value: number) => void;
-    /** Set the video wallpaper brightness, 0-100. */
-    setVideoBrightness: (value: number) => void;
+    /** Set a scheme's wallpaper blur radius, px. */
+    setWallpaperBlur: (value: number, scheme?: AquaScheme) => void;
+    /** Set a scheme's wallpaper frost veil, 0-100. */
+    setWallpaperFrost: (value: number, scheme?: AquaScheme) => void;
+    /** Set a scheme's video wallpaper blur radius, px. */
+    setVideoBlur: (value: number, scheme?: AquaScheme) => void;
+    /** Set a scheme's video wallpaper brightness, 0-100. */
+    setVideoBrightness: (value: number, scheme?: AquaScheme) => void;
 }
 /** Full component props: runtime share + store share + locale seat + injected face. */
 export type AquaAppearanceRowComponentProps = PropsRuntime<'settings.general.item'> & PropsStore<ReturnType<typeof createAquaRowStore>> & PropsLocale<'settings.aqua'> & AquaAppearanceRowInjected;

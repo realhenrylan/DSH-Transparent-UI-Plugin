@@ -2,8 +2,8 @@
  * Aqua row registered into the General settings section
  * (`settings.general.item`, right under Appearance): every glass knob — mode
  * (mica / compatibility), blur/frost (mica mode only), fluid color,
- * background brightness, the backdrop source picker, and the wallpaper
- * picker with its two knobs. Every
+ * background brightness, the backdrop source picker, and one wallpaper block
+ * per scheme (light / dark) with its own knobs. Every
  * write goes straight through to the layer, so the skin moves live. The
  * controls follow the Appearance cubes directly (no row title of their own),
  * and the master switch remains available when the other controls are off.
@@ -15,7 +15,11 @@ import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import { fileToDataUrl, readFileAsDataUrl, Knob, Segmented } from './AquaControls.tsx'
 import { saveVideoBlob, saveVideoHandle } from './wallpaper-store.ts'
 import type { createAquaRowStore } from './settings-store.ts'
+import type { AquaScheme, AquaWallpaperSettings } from './theme-layer.ts'
 import css from './AquaAppearanceRow.module.css'
+
+/** Schemes whose wallpapers are stored separately. */
+const SCHEMES: readonly AquaScheme[] = ['light', 'dark']
 
 /** Injected business face for the master switch and every knob. */
 export interface AquaAppearanceRowInjected {
@@ -35,8 +39,8 @@ export interface AquaAppearanceRowInjected {
   setBgBrightness: (value: number) => void
   /** Set the backdrop source. */
   setBackground: (value: 'fluid' | 'wallpaper') => void
-  /** Set the wallpaper image (a data URL). */
-  setWallpaper: (value: string) => void
+  /** Set a scheme's wallpaper image (a data URL, `idb:` blob, or `fsa:` handle). */
+  setWallpaper: (value: string, scheme?: AquaScheme) => void
   /** Set the particle-whale flag. */
   setWhale: (value: boolean) => void
   /** Set the ambient marine-life flag. */
@@ -47,14 +51,14 @@ export interface AquaAppearanceRowInjected {
   setSpotlight: (value: boolean) => void
   /** Set the hover-press flag. */
   setPress: (value: boolean) => void
-  /** Set the wallpaper blur radius, px. */
-  setWallpaperBlur: (value: number) => void
-  /** Set the wallpaper frost veil, 0-100. */
-  setWallpaperFrost: (value: number) => void
-  /** Set the video wallpaper blur radius, px. */
-  setVideoBlur: (value: number) => void
-  /** Set the video wallpaper brightness, 0-100. */
-  setVideoBrightness: (value: number) => void
+  /** Set a scheme's wallpaper blur radius, px. */
+  setWallpaperBlur: (value: number, scheme?: AquaScheme) => void
+  /** Set a scheme's wallpaper frost veil, 0-100. */
+  setWallpaperFrost: (value: number, scheme?: AquaScheme) => void
+  /** Set a scheme's video wallpaper blur radius, px. */
+  setVideoBlur: (value: number, scheme?: AquaScheme) => void
+  /** Set a scheme's video wallpaper brightness, 0-100. */
+  setVideoBrightness: (value: number, scheme?: AquaScheme) => void
 }
 
 /** Full component props: runtime share + store share + locale seat + injected face. */
@@ -82,57 +86,15 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
   const bgBrightness = useStore(s => s.bgBrightness)
   const dark = useStore(s => s.dark)
   const background = useStore(s => s.background)
+  const wallpapers = useStore(s => s.wallpapers)
   const whale = useStore(s => s.whale)
   const critters = useStore(s => s.critters)
   const mesh = useStore(s => s.mesh)
   const spotlight = useStore(s => s.spotlight)
   const press = useStore(s => s.press)
-  const wallpaper = useStore(s => s.wallpaper)
-  const wallpaperBlur = useStore(s => s.wallpaperBlur)
-  const wallpaperFrost = useStore(s => s.wallpaperFrost)
-  const videoBlur = useStore(s => s.videoBlur)
-  const videoBrightness = useStore(s => s.videoBrightness)
-  const fileRef = useRef<HTMLInputElement | null>(null)
-  const videoRef = useRef<HTMLInputElement | null>(null)
-
-  // Videos are `idb:` blobs, `fsa:` remembered-file handles, or legacy
-  // `data:video/` URLs.
-  const isVideoWallpaper = wallpaper.startsWith('data:video/') || wallpaper.startsWith('idb:') || wallpaper.startsWith('fsa:')
-
-  /** Pick a video. Chromium: File System Access — the browser remembers the
-   *  file authorization, so later visits re-read the ORIGINAL file with no
-   *  storage copy. Other browsers fall back to the plain file input. */
-  const pickVideo = (): void => {
-    if (window.showOpenFilePicker !== undefined) {
-      void (async () => {
-        try {
-          const [handle] = await window.showOpenFilePicker({
-            multiple: false,
-            types: [{ description: 'Video', accept: { 'video/*': ['.mp4', '.webm', '.ogg', '.mov', '.m4v', '.mkv'] } }],
-          })
-          if (handle === undefined) return
-          setBackground('wallpaper')
-          if (await saveVideoHandle(handle)) {
-            setWallpaper(`fsa:${handle.name}`)
-          } else {
-            // idb unavailable — degrade to the blob store / data URL path.
-            const file = await handle.getFile()
-            void saveVideoBlob(file).then((id) => {
-              if (id !== '') setWallpaper(id)
-              else void readFileAsDataUrl(file).then(setWallpaper)
-            })
-          }
-        } catch (error) {
-          // Electron or browser policy may expose the API but reject it for
-          // this origin. A normal file input is still available in that case.
-          if (error instanceof DOMException && error.name === 'AbortError') return
-          videoRef.current?.click()
-        }
-      })()
-    } else {
-      videoRef.current?.click()
-    }
-  }
+  // The scheme whose slot currently paints the page; the other one is stored
+  // for later but does not affect the live backdrop.
+  const activeScheme: AquaScheme = dark ? 'dark' : 'light'
 
   // The brightness knob only ever offers the half that makes sense for the
   // resolved scheme: dark mode darkens (0-50), light mode brightens (50-100).
@@ -208,81 +170,23 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
 
           {background === 'wallpaper' && (
             <>
-              <div className={css.row}>
-                <span className={css.rowLabel}>{t('aqua.wallpaper')}</span>
-                <div className={css.wallpaperPick}>
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="image/*"
-                    className={css.fileInput}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file !== undefined) {
-                        setBackground('wallpaper')
-                        void fileToDataUrl(file).then(setWallpaper)
-                      }
-                      e.target.value = ''
-                    }}
-                  />
-                  <input
-                    ref={videoRef}
-                    type="file"
-                    accept="video/mp4,video/webm,video/ogg,video/quicktime"
-                    className={css.fileInput}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file !== undefined) {
-                        // Picking a backdrop switches the source to wallpaper
-                        // automatically, so the media shows right away. The
-                        // video plays through the browser's native decoder as
-                        // the background (no controls, no progress bar).
-                        setBackground('wallpaper')
-                        // ALWAYS persist videos in IndexedDB: even a small
-                        // video's data URL can blow the localStorage quota
-                        // (base64 inflates 33%), which would silently lose
-                        // the wallpaper on the next reload. Only when idb is
-                        // unavailable do we fall back to the data-URL path.
-                        void saveVideoBlob(file).then((id) => {
-                          if (id !== '') {
-                            setWallpaper(id)
-                          } else {
-                            void readFileAsDataUrl(file).then(setWallpaper)
-                          }
-                        })
-                      }
-                      e.target.value = ''
-                    }}
-                  />
-                  <button type="button" className={css.pickButton} onClick={() => { fileRef.current?.click() }}>
-                    {t('aqua.chooseImage')}
-                  </button>
-                  <button type="button" className={css.pickButton} onClick={pickVideo}>
-                    {t('aqua.chooseVideo')}
-                  </button>
-                  {wallpaper !== '' && (
-                    <button type="button" className={css.deleteButton} onClick={() => { setWallpaper(''); setBackground('fluid') }}>
-                      {t('aqua.deleteWallpaper')}
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div className={css.knobHint}>{t('aqua.wallpaperHint')}</div>
-              {/* 视频壁纸不支持模糊/磨砂调节（视频直接清晰播放） */}
-              {!isVideoWallpaper && (
-                <>
-                  <Knob label={t('aqua.wallpaperBlur')} value={wallpaperBlur} min={0} max={40} step={0.5} unit="px" onChange={setWallpaperBlur} />
-                  <Knob label={t('aqua.wallpaperFrost')} value={wallpaperFrost} min={0} max={100} step={1} unit="%" onChange={setWallpaperFrost} />
-                </>
-              )}
-              {/* 视频壁纸：模糊度 + 亮度，配上提醒 */}
-              {isVideoWallpaper && (
-                <>
-                  <Knob label={t('aqua.videoBlur')} value={videoBlur} min={0} max={40} step={0.5} unit="px" onChange={setVideoBlur} />
-                  <Knob label={t('aqua.videoBrightness')} value={videoBrightness} min={0} max={100} step={1} unit="%" onChange={setVideoBrightness} />
-                  <div className={css.knobHint}>{t('aqua.videoHint')}</div>
-                </>
-              )}
+              <div className={css.groupHint}>{t('aqua.wallpaperHint')}</div>
+              {SCHEMES.map((scheme) => (
+                <WallpaperSlot
+                  key={scheme}
+                  scheme={scheme}
+                  active={activeScheme === scheme}
+                  value={wallpapers[scheme]}
+                  label={t(scheme === 'light' ? 'aqua.wallpaperLight' : 'aqua.wallpaperDark')}
+                  t={t}
+                  setWallpaper={setWallpaper}
+                  setBackground={setBackground}
+                  setWallpaperBlur={setWallpaperBlur}
+                  setWallpaperFrost={setWallpaperFrost}
+                  setVideoBlur={setVideoBlur}
+                  setVideoBrightness={setVideoBrightness}
+                />
+              ))}
             </>
           )}
 
@@ -379,6 +283,171 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
         </div>
       )}
       </>}
+    </div>
+  )
+}
+
+/** Props shared by the two per-scheme wallpaper blocks. */
+interface WallpaperSlotProps {
+  /** Which scheme this block edits. */
+  scheme: AquaScheme
+  /** This scheme is the one currently painting the page. */
+  active: boolean
+  /** Stored settings for this scheme's slot. */
+  value: AquaWallpaperSettings
+  /** Localized scheme name (also the group label). */
+  label: string
+  t: AquaAppearanceRowComponentProps['t']
+  setWallpaper: AquaAppearanceRowInjected['setWallpaper']
+  setBackground: AquaAppearanceRowInjected['setBackground']
+  setWallpaperBlur: AquaAppearanceRowInjected['setWallpaperBlur']
+  setWallpaperFrost: AquaAppearanceRowInjected['setWallpaperFrost']
+  setVideoBlur: AquaAppearanceRowInjected['setVideoBlur']
+  setVideoBrightness: AquaAppearanceRowInjected['setVideoBrightness']
+}
+
+/**
+ * One scheme's wallpaper block: pickers, delete, and the knobs for that
+ * scheme's media. The inactive scheme only stores values; switching the
+ * system appearance swaps which slot paints the page.
+ */
+function WallpaperSlot(props: WallpaperSlotProps) {
+  const { scheme, active, value, label, t, setWallpaper, setBackground } = props
+  const fileRef = useRef<HTMLInputElement | null>(null)
+  const videoRef = useRef<HTMLInputElement | null>(null)
+  // Videos are `idb:` blobs, `fsa:` remembered-file handles, or legacy
+  // `data:video/` URLs.
+  const isVideo = value.image.startsWith('data:video/') || value.image.startsWith('idb:') || value.image.startsWith('fsa:')
+
+  /** Keep the live backdrop on wallpaper only when this slot is on screen. */
+  const reveal = (): void => {
+    if (active) setBackground('wallpaper')
+  }
+
+  /** Pick a video. Chromium: File System Access — the browser remembers the
+   *  file authorization, so later visits re-read the ORIGINAL file with no
+   *  storage copy. Other browsers fall back to the plain file input. */
+  const pickVideo = (): void => {
+    if (window.showOpenFilePicker !== undefined) {
+      void (async () => {
+        try {
+          const [handle] = await window.showOpenFilePicker({
+            multiple: false,
+            types: [{ description: 'Video', accept: { 'video/*': ['.mp4', '.webm', '.ogg', '.mov', '.m4v', '.mkv'] } }],
+          })
+          if (handle === undefined) return
+          reveal()
+          if (await saveVideoHandle(handle, scheme)) {
+            setWallpaper(`fsa:${handle.name}`, scheme)
+          } else {
+            // idb unavailable — degrade to the blob store / data URL path.
+            const file = await handle.getFile()
+            void saveVideoBlob(file).then((id) => {
+              if (id !== '') setWallpaper(id, scheme)
+              else void readFileAsDataUrl(file).then((source) => { setWallpaper(source, scheme) })
+            })
+          }
+        } catch (error) {
+          // Electron or browser policy may expose the API but reject it for
+          // this origin. A normal file input is still available in that case.
+          if (error instanceof DOMException && error.name === 'AbortError') return
+          videoRef.current?.click()
+        }
+      })()
+    } else {
+      videoRef.current?.click()
+    }
+  }
+
+  return (
+    <div
+      className={active ? `${css.schemeBlock} ${css.schemeBlockActive}` : css.schemeBlock}
+      role="group"
+      aria-label={label}
+    >
+      <div className={css.row}>
+        <span className={css.rowLabel}>{label}</span>
+        <div className={css.wallpaperPick}>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className={css.fileInput}
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file !== undefined) {
+                reveal()
+                void fileToDataUrl(file).then((source) => { setWallpaper(source, scheme) })
+              }
+              e.target.value = ''
+            }}
+          />
+          <input
+            ref={videoRef}
+            type="file"
+            accept="video/mp4,video/webm,video/ogg,video/quicktime"
+            className={css.fileInput}
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file !== undefined) {
+                reveal()
+                // ALWAYS persist videos in IndexedDB: even a small video's
+                // data URL can blow the localStorage quota (base64 inflates
+                // 33%), which would silently lose the wallpaper on the next
+                // reload. Only when idb is unavailable do we fall back to the
+                // data-URL path.
+                void saveVideoBlob(file).then((id) => {
+                  if (id !== '') {
+                    setWallpaper(id, scheme)
+                  } else {
+                    void readFileAsDataUrl(file).then((source) => { setWallpaper(source, scheme) })
+                  }
+                })
+              }
+              e.target.value = ''
+            }}
+          />
+          <button type="button" className={css.pickButton} onClick={() => { fileRef.current?.click() }}>
+            {t('aqua.chooseImage')}
+          </button>
+          <button type="button" className={css.pickButton} onClick={pickVideo}>
+            {t('aqua.chooseVideo')}
+          </button>
+          {value.image !== '' && (
+            <button
+              type="button"
+              className={css.deleteButton}
+              onClick={() => {
+                setWallpaper('', scheme)
+                if (active) setBackground('fluid')
+              }}
+            >
+              {t('aqua.deleteWallpaper')}
+            </button>
+          )}
+          {active && <span className={css.activeBadge}>{t('aqua.wallpaperActive')}</span>}
+        </div>
+      </div>
+      {value.image === '' && <div className={css.knobHint}>{t('aqua.wallpaperEmpty')}</div>}
+      {/* 图片壁纸：模糊 + 磨砂；视频不适用（视频直接清晰播放） */}
+      {value.image !== '' && !isVideo && (
+        <>
+          <Knob label={t('aqua.wallpaperBlur')} value={value.blur} min={0} max={40} step={0.5} unit="px"
+            onChange={(next) => { props.setWallpaperBlur(next, scheme) }} />
+          <Knob label={t('aqua.wallpaperFrost')} value={value.frost} min={0} max={100} step={1} unit="%"
+            onChange={(next) => { props.setWallpaperFrost(next, scheme) }} />
+        </>
+      )}
+      {/* 视频壁纸：模糊度 + 亮度，配上提醒 */}
+      {isVideo && (
+        <>
+          <Knob label={t('aqua.videoBlur')} value={value.videoBlur} min={0} max={40} step={0.5} unit="px"
+            onChange={(next) => { props.setVideoBlur(next, scheme) }} />
+          <Knob label={t('aqua.videoBrightness')} value={value.videoBrightness} min={0} max={100} step={1} unit="%"
+            onChange={(next) => { props.setVideoBrightness(next, scheme) }} />
+          <div className={css.knobHint}>{t('aqua.videoHint')}</div>
+        </>
+      )}
     </div>
   )
 }

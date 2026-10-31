@@ -25,6 +25,6 @@ export declare function loadVideoBlob(id: string): Promise<Blob | null>;
 export declare function deleteVideoBlob(id: string): Promise<void>;
 /** Persist a File System Access handle so the next visit can re-read the
  *  ORIGINAL file without the user picking it again. */
-export declare function saveVideoHandle(handle: FileSystemFileHandle): Promise<boolean>;
-/** Load the remembered file handle (null when absent or storage fails). */
-export declare function loadVideoHandle(): Promise<FileSystemFileHandle | null>;
+export declare function saveVideoHandle(handle: FileSystemFileHandle, scheme: 'light' | 'dark'): Promise<boolean>;
+/** Load one scheme's remembered file handle (null when absent or storage fails). */
+export declare function loadVideoHandle(scheme: 'light' | 'dark'): Promise<FileSystemFileHandle | null>;

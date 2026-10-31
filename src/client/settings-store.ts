@@ -4,6 +4,13 @@
  * the only writer; the row component reads via props.useStore.
  */
 import { defineStore, type EngineStoreHandle } from '@deepseek-ai/dsh-client-store'
+import type { AquaScheme, AquaWallpaperSettings } from './theme-layer.ts'
+
+/** Wallpaper slot state for both schemes when nothing is configured yet. */
+const EMPTY_WALLPAPERS: Record<AquaScheme, AquaWallpaperSettings> = {
+  light: { image: '', blur: 0, frost: 0, videoBlur: 6, videoBrightness: 45 },
+  dark: { image: '', blur: 0, frost: 0, videoBlur: 6, videoBrightness: 45 },
+}
 
 /** Store state mirrored from the Aqua settings scope. */
 export interface AquaRowState {
@@ -25,8 +32,8 @@ export interface AquaRowState {
   dark: boolean
   /** Backdrop source: fluid board or custom wallpaper. */
   background: 'fluid' | 'wallpaper'
-  /** Wallpaper image data URL. */
-  wallpaper: string
+  /** Per-scheme wallpaper slots; the active scheme decides which one paints. */
+  wallpapers: Record<AquaScheme, AquaWallpaperSettings>
   /** Particle whale in the chat area center. */
   whale: boolean
   /** Ambient marine life (fish / bubbles / plankton). */
@@ -37,14 +44,6 @@ export interface AquaRowState {
   spotlight: boolean
   /** Hover press-down for the glass panes. */
   press: boolean
-  /** Wallpaper blur radius, px. */
-  wallpaperBlur: number
-  /** Wallpaper frost veil, 0-100. */
-  wallpaperFrost: number
-  /** Video wallpaper blur radius, px. */
-  videoBlur: number
-  /** Video wallpaper brightness, 0-100. */
-  videoBrightness: number
   /** Monotonic revision; -1 until first sync so revision 0 lands as a change. */
   revision: number
 }
@@ -60,16 +59,12 @@ export interface AquaSettingsPayload {
   bgBrightness: number
   dark: boolean
   background: 'fluid' | 'wallpaper'
-  wallpaper: string
+  wallpapers: Record<AquaScheme, AquaWallpaperSettings>
   whale: boolean
   critters: boolean
   mesh: boolean
   spotlight: boolean
   press: boolean
-  wallpaperBlur: number
-  wallpaperFrost: number
-  videoBlur: number
-  videoBrightness: number
 }
 
 /** Declared action shape giving the exported factory a stable return type. */
@@ -93,16 +88,12 @@ export function createAquaRowStore(): EngineStoreHandle<AquaRowState, AquaRowAct
       bgBrightness: 50,
       dark: false,
       background: 'fluid',
-      wallpaper: '',
+      wallpapers: { light: { ...EMPTY_WALLPAPERS.light }, dark: { ...EMPTY_WALLPAPERS.dark } },
       whale: true,
       critters: true,
       mesh: true,
       spotlight: true,
       press: true,
-      wallpaperBlur: 0,
-      wallpaperFrost: 0,
-      videoBlur: 6,
-      videoBrightness: 45,
       revision: -1,
     }),
     actions: {
@@ -117,16 +108,12 @@ export function createAquaRowStore(): EngineStoreHandle<AquaRowState, AquaRowAct
         d.bgBrightness = next.bgBrightness
         d.dark = next.dark
         d.background = next.background
-        d.wallpaper = next.wallpaper
+        d.wallpapers = next.wallpapers
         d.whale = next.whale
         d.critters = next.critters
         d.mesh = next.mesh
         d.spotlight = next.spotlight
         d.press = next.press
-        d.wallpaperBlur = next.wallpaperBlur
-        d.wallpaperFrost = next.wallpaperFrost
-        d.videoBlur = next.videoBlur
-        d.videoBrightness = next.videoBrightness
         d.revision = revision
       },
     },

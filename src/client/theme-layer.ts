@@ -224,6 +224,23 @@ function writeEnabled(value: boolean): void {
   }
 }
 
+/** Color scheme a wallpaper slot belongs to. */
+export type AquaScheme = 'light' | 'dark'
+
+/** One scheme's wallpaper: the media plus its tuning knobs. */
+export interface AquaWallpaperSettings {
+  /** Image data URL, `idb:<id>` / `fsa:<name>` video marker, or '' (unset). */
+  image: string
+  /** Wallpaper blur radius, px. */
+  blur: number
+  /** Wallpaper frost veil, 0-100. */
+  frost: number
+  /** Video wallpaper blur radius, px (0 = crisp, 40 = heavy acrylic). */
+  videoBlur: number
+  /** Video wallpaper brightness, 0-100 (100 = fully lit, 0 = deepest dim). */
+  videoBrightness: number
+}
+
 /** Tunable layer knobs, persisted independently of the enable flag. */
 export interface AquaSettings {
   /** Rendering mode: mica (frosted floating cards) or the stock layout with a generic glass material. */
@@ -240,8 +257,8 @@ export interface AquaSettings {
   bgBrightness: number
   /** Backdrop source: the living fluid board or a custom wallpaper. */
   background: 'fluid' | 'wallpaper'
-  /** Wallpaper image data URL (empty until one is picked). */
-  wallpaper: string
+  /** Per-scheme wallpapers: light mode draws one, dark mode the other. */
+  wallpapers: Record<AquaScheme, AquaWallpaperSettings>
   /** Particle whale in the chat area center (the harness hero fish). */
   whale: boolean
   /** Ambient marine life (fish / bubbles / plankton). */
@@ -252,14 +269,15 @@ export interface AquaSettings {
   spotlight: boolean
   /** Hover press-down: the pane under the cursor sinks a touch (tactile depth). */
   press: boolean
-  /** Wallpaper blur radius, px. */
-  wallpaperBlur: number
-  /** Wallpaper frost veil, 0-100. */
-  wallpaperFrost: number
-  /** Video wallpaper blur radius, px (0 = crisp, 40 = heavy acrylic). */
-  videoBlur: number
-  /** Video wallpaper brightness, 0-100 (100 = fully lit, 0 = deepest dim). */
-  videoBrightness: number
+}
+
+/** First-run wallpaper slot: no media, neutral knobs. */
+const WALLPAPER_DEFAULTS: AquaWallpaperSettings = {
+  image: '',
+  blur: 0,
+  frost: 0,
+  videoBlur: 6,
+  videoBrightness: 45,
 }
 
 /** Shipped defaults — what a first-time install sees (the tuned look). */
@@ -269,7 +287,7 @@ const SETTINGS_DEFAULTS: AquaSettings = {
   frost: 7,
   bgBrightness: 50,
   background: 'fluid',
-  wallpaper: '',
+  wallpapers: { light: { ...WALLPAPER_DEFAULTS }, dark: { ...WALLPAPER_DEFAULTS } },
   whale: true,
   critters: true,
   mesh: true,
@@ -277,10 +295,6 @@ const SETTINGS_DEFAULTS: AquaSettings = {
   press: true,
   fluidHue: 320,
   fluidDepth: 25,
-  wallpaperBlur: 0,
-  wallpaperFrost: 0,
-  videoBlur: 6,
-  videoBrightness: 45,
 }
 
 /** Numeric knob keys and their localStorage names. */
@@ -290,16 +304,27 @@ const NUMERIC_KEYS = {
   fluidHue: 'dsh.ui-aqua.fluidHue',
   fluidDepth: 'dsh.ui-aqua.fluidDepth',
   bgBrightness: 'dsh.ui-aqua.bgBrightness',
-  wallpaperBlur: 'dsh.ui-aqua.wallpaperBlur',
-  wallpaperFrost: 'dsh.ui-aqua.wallpaperFrost',
-  videoBlur: 'dsh.ui-aqua.videoBlur',
-  videoBrightness: 'dsh.ui-aqua.videoBrightness',
 } as const
 type NumericKey = keyof typeof NUMERIC_KEYS
 
+/** Wallpaper knob names: the numeric keys owned by one scheme's slot. */
+type WallpaperKnob = 'blur' | 'frost' | 'videoBlur' | 'videoBrightness'
+
 const MODE_KEY = 'dsh.ui-aqua.mode'
 const BACKGROUND_KEY = 'dsh.ui-aqua.background'
-const WALLPAPER_KEY = 'dsh.ui-aqua.wallpaper'
+/** Wallpaper slots: dark keeps the historic key, because before the split it
+ *  owned the only wallpaper (an upgrade therefore lands as the dark one). */
+const WALLPAPER_KEYS: Record<AquaScheme, string> = {
+  light: 'dsh.ui-aqua.wallpaperLight',
+  dark: 'dsh.ui-aqua.wallpaper',
+}
+/** Pre-split per-knob keys, still read as the first-run slot defaults. */
+const LEGACY_KNOB_KEYS: Record<WallpaperKnob, string> = {
+  blur: 'dsh.ui-aqua.wallpaperBlur',
+  frost: 'dsh.ui-aqua.wallpaperFrost',
+  videoBlur: 'dsh.ui-aqua.videoBlur',
+  videoBrightness: 'dsh.ui-aqua.videoBrightness',
+}
 const WHALE_KEY = 'dsh.ui-aqua.whale'
 const CRITTERS_KEY = 'dsh.ui-aqua.critters'
 const MESH_KEY = 'dsh.ui-aqua.mesh'
@@ -308,10 +333,16 @@ const PRESS_KEY = 'dsh.ui-aqua.press'
 
 /** Clamp a numeric knob into its sane range. */
 function clampSetting(key: NumericKey, value: number): number {
-  const max = key === 'blur' || key === 'wallpaperBlur' || key === 'videoBlur' ? 40
-    : key === 'frost' || key === 'fluidDepth' || key === 'wallpaperFrost' || key === 'bgBrightness' || key === 'videoBrightness' ? 100
+  const max = key === 'blur' ? 40
+    : key === 'frost' || key === 'fluidDepth' || key === 'bgBrightness' ? 100
       : 360
   return Number.isFinite(value) ? Math.min(max, Math.max(0, value)) : SETTINGS_DEFAULTS[key]
+}
+
+/** Clamp a wallpaper slot knob into its sane range. */
+function clampWallpaperKnob(key: WallpaperKnob, value: number): number {
+  const max = key === 'blur' || key === 'videoBlur' ? 40 : 100
+  return Number.isFinite(value) ? Math.min(max, Math.max(0, value)) : WALLPAPER_DEFAULTS[key]
 }
 
 /** Read one numeric knob from localStorage (absent/parse failure means the default). */
@@ -372,22 +403,86 @@ function writeMode(value: 'mica' | 'compat'): void {
   }
 }
 
-/** Read the wallpaper data URL (absent/oversized means empty). */
-function readWallpaper(): string {
+/** Read one legacy wallpaper knob (the pre-split single-slot keys). */
+function readLegacyWallpaperKnob(key: WallpaperKnob): number {
   try {
-    return localStorage.getItem(WALLPAPER_KEY) ?? ''
+    const raw = localStorage.getItem(LEGACY_KNOB_KEYS[key])
+    return raw === null ? WALLPAPER_DEFAULTS[key] : clampWallpaperKnob(key, Number(raw))
   } catch {
-    return ''
+    return WALLPAPER_DEFAULTS[key]
   }
 }
 
-/** Persist the wallpaper data URL (quota failures keep it in memory only). */
-function writeWallpaper(value: string): void {
+/** Read one scheme's wallpaper slot. Accepts both pre-split storage shapes
+ *  (a bare data URL / `idb:` / `fsa:` marker plus the per-knob keys) so an
+ *  existing install keeps its wallpaper and tuning after the upgrade. */
+function readWallpaper(scheme: AquaScheme): AquaWallpaperSettings {
+  const legacy: AquaWallpaperSettings = {
+    image: '',
+    blur: readLegacyWallpaperKnob('blur'),
+    frost: readLegacyWallpaperKnob('frost'),
+    videoBlur: readLegacyWallpaperKnob('videoBlur'),
+    videoBrightness: readLegacyWallpaperKnob('videoBrightness'),
+  }
   try {
-    localStorage.setItem(WALLPAPER_KEY, value)
+    const raw = localStorage.getItem(WALLPAPER_KEYS[scheme])
+    if (raw === null || raw === '') return legacy
+    // Before the split the key held the media alone (data URL or marker).
+    if (!raw.startsWith('{')) return { ...legacy, image: raw }
+    const parsed: unknown = JSON.parse(raw)
+    if (parsed === null || typeof parsed !== 'object') return legacy
+    const slot = parsed as Partial<Record<keyof AquaWallpaperSettings, unknown>>
+    return {
+      image: typeof slot.image === 'string' ? slot.image : '',
+      blur: clampWallpaperKnob('blur', Number(slot.blur)),
+      frost: clampWallpaperKnob('frost', Number(slot.frost)),
+      videoBlur: clampWallpaperKnob('videoBlur', Number(slot.videoBlur)),
+      videoBrightness: clampWallpaperKnob('videoBrightness', Number(slot.videoBrightness)),
+    }
+  } catch {
+    return legacy
+  }
+}
+
+/** Persist one scheme's wallpaper slot (quota failures keep it in memory only). */
+function writeWallpaper(scheme: AquaScheme, value: AquaWallpaperSettings): void {
+  try {
+    localStorage.setItem(WALLPAPER_KEYS[scheme], JSON.stringify({
+      image: value.image,
+      blur: value.blur,
+      frost: value.frost,
+      videoBlur: value.videoBlur,
+      videoBrightness: value.videoBrightness,
+    }))
   } catch {
     /* in-memory state still applies for this tab */
   }
+}
+
+/** Whether this scheme ever stored its own slot (a cleared slot stays cleared). */
+function hasStoredWallpaper(scheme: AquaScheme): boolean {
+  try {
+    return localStorage.getItem(WALLPAPER_KEYS[scheme]) !== null
+  } catch {
+    return false
+  }
+}
+
+/** Read both slots, seeding the light one from the pre-split (dark) wallpaper
+ *  once so the upgrade looks unchanged in either scheme; each scheme then
+ *  keeps whatever the user picks for it. */
+function readWallpapers(): Record<AquaScheme, AquaWallpaperSettings> {
+  const dark = readWallpaper('dark')
+  const light = readWallpaper('light')
+  if (light.image !== '' || dark.image === '' || hasStoredWallpaper('light')) return { light, dark }
+  const seeded = { ...dark }
+  writeWallpaper('light', seeded)
+  return { light: seeded, dark }
+}
+
+/** Whether a stored wallpaper value names a video rather than an image. */
+function isVideoMarker(image: string): boolean {
+  return image.startsWith('data:video/') || image.startsWith('idb:') || image.startsWith('fsa:')
 }
 
 /** Read the particle-whale flag (absent means on). */
@@ -537,7 +632,8 @@ export class AquaLayer {
           }
         }
         const settingsChanged = key === null || Object.values<string>(NUMERIC_KEYS).includes(key)
-          || key === BACKGROUND_KEY || key === WALLPAPER_KEY || key === MODE_KEY || key === WHALE_KEY
+          || key === WALLPAPER_KEYS.light || key === WALLPAPER_KEYS.dark
+          || key === BACKGROUND_KEY || key === MODE_KEY || key === WHALE_KEY
           || key === CRITTERS_KEY || key === MESH_KEY || key === SPOTLIGHT_KEY || key === PRESS_KEY
         if (settingsChanged) {
           this.reloadSettings()
@@ -583,7 +679,8 @@ export class AquaLayer {
 
   /** Current knob values (the settings row mirrors these). */
   getSettings(): AquaSettings {
-    return { ...this.settings }
+    const { light, dark } = this.settings.wallpapers
+    return { ...this.settings, wallpapers: { light: { ...light }, dark: { ...dark } } }
   }
 
   /** Whether the resolved palette is dark (the brightness knob darkens). */
@@ -598,6 +695,33 @@ export class AquaLayer {
     } catch {
       return activeScheme() === 'dark'
     }
+  }
+
+  /** The scheme whose wallpaper is on screen (and the setters' default). */
+  private scheme(): AquaScheme {
+    return this.dark ? 'dark' : 'light'
+  }
+
+  /** Effective backdrop: a scheme without a wallpaper falls back to fluid. */
+  private backdrop(): 'fluid' | 'wallpaper' {
+    return this.settings.background === 'wallpaper' && this.settings.wallpapers[this.scheme()].image !== ''
+      ? 'wallpaper'
+      : 'fluid'
+  }
+
+  /** Rewrite one scheme's wallpaper slot and persist it. */
+  private patchWallpaper(scheme: AquaScheme, patch: Partial<AquaWallpaperSettings>): void {
+    const next = { ...this.settings.wallpapers[scheme], ...patch }
+    this.settings.wallpapers = { ...this.settings.wallpapers, [scheme]: next }
+    writeWallpaper(scheme, next)
+  }
+
+  /** Rewrite one wallpaper knob for a scheme (clamped) and re-apply. */
+  private patchWallpaperKnob(scheme: AquaScheme, key: WallpaperKnob, value: number): void {
+    const next = clampWallpaperKnob(key, value)
+    if (next === this.settings.wallpapers[scheme][key]) return
+    this.patchWallpaper(scheme, { [key]: next })
+    if (this.enabled) this.applySettings()
   }
 
   /** Re-read every knob from localStorage into memory. */
@@ -618,16 +742,12 @@ export class AquaLayer {
       fluidDepth: readSetting('fluidDepth'),
       bgBrightness: readSetting('bgBrightness'),
       background: readBackground(),
-      wallpaper: readWallpaper(),
+      wallpapers: readWallpapers(),
       whale: readWhale(),
       critters: readCritters(),
       mesh: readMesh(),
       spotlight: readSpotlight(),
       press: readPress(),
-      wallpaperBlur: readSetting('wallpaperBlur'),
-      wallpaperFrost: readSetting('wallpaperFrost'),
-      videoBlur: readSetting('videoBlur'),
-      videoBrightness: readSetting('videoBrightness'),
     }
   }
 
@@ -703,20 +823,15 @@ export class AquaLayer {
     if (this.enabled) this.applySettings()
   }
 
-  /** Set the wallpaper image (a data URL; empty clears it) or a large video
-   *  (`idb:<id>` marker whose blob lives in IndexedDB). */
-  setWallpaper(value: string): void {
-    const previous = this.settings.wallpaper
-    this.settings.wallpaper = value
-    writeWallpaper(value)
-    if (previous.startsWith('idb:') && value !== previous) {
-      void deleteVideoBlob(previous.slice(4))
-    }
-    if (!value.startsWith('idb:') && this.videoObjectUrl !== undefined) {
-      URL.revokeObjectURL(this.videoObjectUrl)
-      this.videoObjectUrl = undefined
-      this.videoBlobId = undefined
-    }
+  /** Replace one scheme's wallpaper: an image data URL, an `idb:<id>` blob
+   *  marker, or an `fsa:<name>` remembered file ('' clears the slot, which
+   *  falls back to the fluid backdrop for that scheme). */
+  setWallpaper(value: string, scheme: AquaScheme = this.scheme()): void {
+    const previous = this.settings.wallpapers[scheme].image
+    if (value === previous) return
+    this.patchWallpaper(scheme, { image: value })
+    if (previous.startsWith('idb:')) void deleteVideoBlob(previous.slice(4))
+    this.releaseUnusedVideoCache()
     if (this.enabled) this.applySettings()
   }
 
@@ -760,40 +875,24 @@ export class AquaLayer {
     if (this.enabled) this.applySettings()
   }
 
-  /** Set the wallpaper blur radius (px). */
-  setWallpaperBlur(value: number): void {
-    const next = clampSetting('wallpaperBlur', value)
-    if (next === this.settings.wallpaperBlur) return
-    this.settings.wallpaperBlur = next
-    writeSetting('wallpaperBlur', next)
-    if (this.enabled) this.applySettings()
+  /** Set a scheme's wallpaper blur radius (px). */
+  setWallpaperBlur(value: number, scheme: AquaScheme = this.scheme()): void {
+    this.patchWallpaperKnob(scheme, 'blur', value)
   }
 
-  /** Set the wallpaper frost veil (0-100). */
-  setWallpaperFrost(value: number): void {
-    const next = clampSetting('wallpaperFrost', value)
-    if (next === this.settings.wallpaperFrost) return
-    this.settings.wallpaperFrost = next
-    writeSetting('wallpaperFrost', next)
-    if (this.enabled) this.applySettings()
+  /** Set a scheme's wallpaper frost veil (0-100). */
+  setWallpaperFrost(value: number, scheme: AquaScheme = this.scheme()): void {
+    this.patchWallpaperKnob(scheme, 'frost', value)
   }
 
-  /** Set the video wallpaper blur radius (px). */
-  setVideoBlur(value: number): void {
-    const next = clampSetting('videoBlur', value)
-    if (next === this.settings.videoBlur) return
-    this.settings.videoBlur = next
-    writeSetting('videoBlur', next)
-    if (this.enabled) this.applySettings()
+  /** Set a scheme's video wallpaper blur radius (px). */
+  setVideoBlur(value: number, scheme: AquaScheme = this.scheme()): void {
+    this.patchWallpaperKnob(scheme, 'videoBlur', value)
   }
 
-  /** Set the video wallpaper brightness (0-100, 100 = fully lit). */
-  setVideoBrightness(value: number): void {
-    const next = clampSetting('videoBrightness', value)
-    if (next === this.settings.videoBrightness) return
-    this.settings.videoBrightness = next
-    writeSetting('videoBrightness', next)
-    if (this.enabled) this.applySettings()
+  /** Set a scheme's video wallpaper brightness (0-100, 100 = fully lit). */
+  setVideoBrightness(value: number, scheme: AquaScheme = this.scheme()): void {
+    this.patchWallpaperKnob(scheme, 'videoBrightness', value)
   }
 
   private sync(): void {
@@ -804,6 +903,11 @@ export class AquaLayer {
   /** Write the knob-driven CSS variables and mode attributes onto <html>. */
   private applySettings(): void {
     const style = document.documentElement.style
+    // The active scheme's slot owns the wallpaper and its tuning knobs; an
+    // empty slot means the fluid board paints that scheme instead.
+    const wallpaper = this.settings.wallpapers[this.scheme()]
+    const backdrop = this.backdrop()
+    const isVideo = isVideoMarker(wallpaper.image)
     style.setProperty('--dsh-aqua-blur', `${this.settings.blur}px`)
     // Frost 0-100 → a 0-1.4 alpha multiplier (50 = 1x). Capped so max frost
     // stays translucent frosted glass instead of collapsing to a solid
@@ -820,13 +924,13 @@ export class AquaLayer {
     style.setProperty('--dsh-aqua-spot-color', this.dark
       ? 'rgba(255, 255, 255, 0.16)'
       : 'rgba(255, 255, 255, 0.5)')
-    style.setProperty('--dsh-aqua-wallpaper-blur', `${this.settings.wallpaperBlur}px`)
-    style.setProperty('--dsh-aqua-wallpaper-frost', String(this.settings.wallpaperFrost / 100))
+    style.setProperty('--dsh-aqua-wallpaper-blur', `${wallpaper.blur}px`)
+    style.setProperty('--dsh-aqua-wallpaper-frost', String(wallpaper.frost / 100))
     // Video wallpaper: blur rides the video's own filter; brightness drives
     // the scrim veil's alpha (100 = fully lit / no veil, 0 = deepest dim,
     // capped at 0.65 so the film never goes fully black).
-    style.setProperty('--dsh-aqua-video-blur', `${this.settings.videoBlur}px`)
-    style.setProperty('--dsh-aqua-video-dim', String(((100 - this.settings.videoBrightness) / 100) * 0.65))
+    style.setProperty('--dsh-aqua-video-blur', `${wallpaper.videoBlur}px`)
+    style.setProperty('--dsh-aqua-video-dim', String(((100 - wallpaper.videoBrightness) / 100) * 0.65))
     // Background brightness: dark mode darkens (0 = pure black, 50 = off),
     // light mode brightens (50 = off, 100 = pure white) — the knob's range
     // and the overlay direction both follow the resolved scheme.
@@ -846,23 +950,23 @@ export class AquaLayer {
     document.documentElement.toggleAttribute(PRESS_ATTRIBUTE, !compat && this.settings.press)
 
     // Backdrop source: flip the ambient container between fluid and wallpaper.
+    // A scheme whose slot is empty keeps the fluid board, so clearing one
+    // scheme's wallpaper never leaves a blank page in the other.
     const ambient = document.querySelector<HTMLElement>('[data-dsh-aqua-ambient]')
-    if (ambient !== null) ambient.dataset.background = this.settings.background
+    if (ambient !== null) ambient.dataset.background = backdrop
     if (ambient !== null) ambient.dataset.critters = this.settings.critters ? 'on' : 'off'
     // The wallpaper may be an image or a video: images and small videos are
     // data URLs; large videos are `idb:<id>` markers (blob in IndexedDB);
     // File System Access videos are `fsa:<name>` markers (the handle lives
     // in IndexedDB and re-reads the original file).
-    const wallpaper = this.settings.wallpaper
-    const isVideo = wallpaper.startsWith('data:video/') || wallpaper.startsWith('idb:') || wallpaper.startsWith('fsa:')
     const wallpaperLayer = document.querySelector<HTMLElement>('[data-dsh-aqua-wallpaper-layer]')
     if (wallpaperLayer !== null) {
-      wallpaperLayer.dataset.background = this.settings.background
+      wallpaperLayer.dataset.background = backdrop
       wallpaperLayer.dataset.media = isVideo ? 'video' : 'image'
     }
     // Mirror the wallpaper state onto <html> so the stylesheet can scope
     // video-mode readability rules (bubble plates) without touching the app.
-    const wallpaperOn = this.settings.background === 'wallpaper' && wallpaper !== ''
+    const wallpaperOn = backdrop === 'wallpaper'
     document.documentElement.toggleAttribute('data-dsh-aqua-wallpaper', wallpaperOn)
     if (wallpaperOn) {
       document.documentElement.setAttribute('data-dsh-aqua-media', isVideo ? 'video' : 'image')
@@ -871,54 +975,45 @@ export class AquaLayer {
     }
     const img = document.querySelector<HTMLImageElement>('[data-dsh-aqua-wallpaper-img]')
     if (img !== null) {
-      if (this.settings.background === 'wallpaper' && wallpaper !== '' && !isVideo) {
-        img.src = wallpaper
+      if (wallpaperOn && !isVideo) {
+        img.src = wallpaper.image
       } else {
         img.removeAttribute('src')
       }
     }
     const video = document.querySelector<HTMLVideoElement>('[data-dsh-aqua-wallpaper-video]')
     if (video !== null) {
-      if (this.settings.background === 'wallpaper' && isVideo) {
-        if (wallpaper.startsWith('idb:')) {
-          const id = wallpaper.slice(4)
-          if (!this.restoreCachedVideo(video, id)) {
+      if (wallpaperOn && isVideo) {
+        const marker = wallpaper.image
+        if (marker.startsWith('idb:')) {
+          if (!this.restoreCachedVideo(video, marker)) {
             const loadId = ++this.videoLoadId
-            void loadVideoBlob(id).then((blob) => {
-              if (blob === null || !this.isCurrentVideoLoad(video, wallpaper, loadId)) return
-              const url = URL.createObjectURL(blob)
-              if (this.videoObjectUrl !== undefined) URL.revokeObjectURL(this.videoObjectUrl)
-              this.videoObjectUrl = url
-              this.videoBlobId = id
-              video.setAttribute('src', url)
-              this.configureWallpaperVideo(video)
+            void loadVideoBlob(marker.slice(4)).then((blob) => {
+              if (blob === null || !this.isCurrentVideoLoad(video, marker, loadId)) return
+              this.adoptVideo(video, URL.createObjectURL(blob), marker)
             })
           }
-        } else if (wallpaper.startsWith('fsa:')) {
-          if (!this.restoreCachedVideo(video, wallpaper)) {
+        } else if (marker.startsWith('fsa:')) {
+          if (!this.restoreCachedVideo(video, marker)) {
+            const scheme = this.scheme()
             const loadId = ++this.videoLoadId
-            void loadVideoHandle().then(async (handle) => {
-              if (handle === null || !this.isCurrentVideoLoad(video, wallpaper, loadId)) return
+            void loadVideoHandle(scheme).then(async (handle) => {
+              if (handle === null || !this.isCurrentVideoLoad(video, marker, loadId)) return
               try {
                 // The browser remembers the file authorization; only a live
                 // grant lets us re-read the original file automatically.
                 const permission = await handle.queryPermission({ mode: 'read' })
-                if (permission !== 'granted' || !this.isCurrentVideoLoad(video, wallpaper, loadId)) return
+                if (permission !== 'granted' || !this.isCurrentVideoLoad(video, marker, loadId)) return
                 const file = await handle.getFile()
-                if (!this.isCurrentVideoLoad(video, wallpaper, loadId)) return
-                const url = URL.createObjectURL(file)
-                if (this.videoObjectUrl !== undefined) URL.revokeObjectURL(this.videoObjectUrl)
-                this.videoObjectUrl = url
-                this.videoBlobId = wallpaper
-                video.setAttribute('src', url)
-                this.configureWallpaperVideo(video)
+                if (!this.isCurrentVideoLoad(video, marker, loadId)) return
+                this.adoptVideo(video, URL.createObjectURL(file), marker)
               } catch {
                 /* file moved/deleted or access revoked — stays empty until re-picked */
               }
             })
           }
-        } else if (video.getAttribute('src') !== wallpaper) {
-          video.setAttribute('src', wallpaper)
+        } else if (video.getAttribute('src') !== marker) {
+          video.setAttribute('src', marker)
           this.configureWallpaperVideo(video)
         }
       } else {
@@ -929,10 +1024,19 @@ export class AquaLayer {
     }
   }
 
+  /** Adopt a freshly created object URL for the given slot marker. */
+  private adoptVideo(video: HTMLVideoElement, url: string, marker: string): void {
+    if (this.videoObjectUrl !== undefined) URL.revokeObjectURL(this.videoObjectUrl)
+    this.videoObjectUrl = url
+    this.videoBlobId = marker
+    video.setAttribute('src', url)
+    this.configureWallpaperVideo(video)
+  }
+
   /** Ignore loads superseded by a backdrop switch, replacement, or unmount. */
-  private isCurrentVideoLoad(video: HTMLVideoElement, wallpaper: string, loadId: number): boolean {
+  private isCurrentVideoLoad(video: HTMLVideoElement, marker: string, loadId: number): boolean {
     return this.videoLoadId === loadId && this.enabled && video.isConnected
-      && this.settings.background === 'wallpaper' && this.settings.wallpaper === wallpaper
+      && this.backdrop() === 'wallpaper' && this.settings.wallpapers[this.scheme()].image === marker
   }
 
   /** The wallpaper plays as a plain <video> element (the browser's own
@@ -950,11 +1054,23 @@ export class AquaLayer {
     })
   }
 
+  /** Drop the cached object URL once neither scheme's slot references it. */
+  private releaseUnusedVideoCache(): void {
+    if (this.videoObjectUrl === undefined) return
+    const used = this.videoBlobId !== undefined
+      && [this.settings.wallpapers.light.image, this.settings.wallpapers.dark.image].includes(this.videoBlobId)
+    if (used) return
+    URL.revokeObjectURL(this.videoObjectUrl)
+    this.videoObjectUrl = undefined
+    this.videoBlobId = undefined
+  }
+
   /** Reuse a cached file without restarting it on ordinary knob changes. */
-  private restoreCachedVideo(video: HTMLVideoElement, id: string): boolean {
-    if (this.videoBlobId !== id || this.videoObjectUrl === undefined) return false
-    // Switching to the fluid background clears the element's src but keeps the
-    // cached URL; restore it when the user switches back to the same video.
+  private restoreCachedVideo(video: HTMLVideoElement, marker: string): boolean {
+    if (this.videoBlobId !== marker || this.videoObjectUrl === undefined) return false
+    // Switching to the fluid background (or to the other scheme) clears the
+    // element's src but keeps the cached URL; restore it when the user comes
+    // back to the same video.
     if (video.getAttribute('src') !== this.videoObjectUrl) {
       video.setAttribute('src', this.videoObjectUrl)
       this.configureWallpaperVideo(video)

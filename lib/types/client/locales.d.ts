@@ -30,6 +30,10 @@ export declare const zh: {
     'aqua.backgroundWallpaper': string;
     'aqua.wallpaper': string;
     'aqua.wallpaperHint': string;
+    'aqua.wallpaperLight': string;
+    'aqua.wallpaperDark': string;
+    'aqua.wallpaperActive': string;
+    'aqua.wallpaperEmpty': string;
     'aqua.chooseImage': string;
     'aqua.chooseVideo': string;
     'aqua.deleteWallpaper': string;
@@ -75,6 +79,10 @@ export declare const en: {
     'aqua.backgroundWallpaper': string;
     'aqua.wallpaper': string;
     'aqua.wallpaperHint': string;
+    'aqua.wallpaperLight': string;
+    'aqua.wallpaperDark': string;
+    'aqua.wallpaperActive': string;
+    'aqua.wallpaperEmpty': string;
     'aqua.chooseImage': string;
     'aqua.chooseVideo': string;
     'aqua.deleteWallpaper': string;

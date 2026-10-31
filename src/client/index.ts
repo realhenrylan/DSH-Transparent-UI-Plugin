@@ -53,16 +53,12 @@ export function apply(ctx: ClientContext): void {
       bgBrightness: s.bgBrightness,
       dark: layer.getDark(),
       background: s.background,
-      wallpaper: s.wallpaper,
+      wallpapers: s.wallpapers,
       whale: s.whale,
       critters: s.critters,
       mesh: s.mesh,
       spotlight: s.spotlight,
       press: s.press,
-      wallpaperBlur: s.wallpaperBlur,
-      wallpaperFrost: s.wallpaperFrost,
-      videoBlur: s.videoBlur,
-      videoBrightness: s.videoBrightness,
     }
   }
   const sync = (): void => {
@@ -111,8 +107,8 @@ export function apply(ctx: ClientContext): void {
         layer.setBackground(background)
         sync()
       },
-      setWallpaper: (wallpaper) => {
-        layer.setWallpaper(wallpaper)
+      setWallpaper: (wallpaper, scheme) => {
+        layer.setWallpaper(wallpaper, scheme)
         sync()
       },
       setWhale: (whale) => {
@@ -135,20 +131,20 @@ export function apply(ctx: ClientContext): void {
         layer.setPress(press)
         sync()
       },
-      setWallpaperBlur: (wallpaperBlur) => {
-        layer.setWallpaperBlur(wallpaperBlur)
+      setWallpaperBlur: (wallpaperBlur, scheme) => {
+        layer.setWallpaperBlur(wallpaperBlur, scheme)
         sync()
       },
-      setWallpaperFrost: (wallpaperFrost) => {
-        layer.setWallpaperFrost(wallpaperFrost)
+      setWallpaperFrost: (wallpaperFrost, scheme) => {
+        layer.setWallpaperFrost(wallpaperFrost, scheme)
         sync()
       },
-      setVideoBlur: (videoBlur) => {
-        layer.setVideoBlur(videoBlur)
+      setVideoBlur: (videoBlur, scheme) => {
+        layer.setVideoBlur(videoBlur, scheme)
         sync()
       },
-      setVideoBrightness: (videoBrightness) => {
-        layer.setVideoBrightness(videoBrightness)
+      setVideoBrightness: (videoBrightness, scheme) => {
+        layer.setVideoBrightness(videoBrightness, scheme)
         sync()
       },
     }

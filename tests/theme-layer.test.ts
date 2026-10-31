@@ -40,12 +40,9 @@ vi.mock('../src/client/wallpaper-store.ts', () => ({
 
 const disposers: Array<() => void> = []
 
-function createLayer(wallpaper: string, colorScheme: 'dark' | 'light' = 'dark'): AquaLayer {
-  localStorage.setItem('dsh.ui-aqua.background', 'wallpaper')
-  localStorage.setItem('dsh.ui-aqua.wallpaper', wallpaper)
-  localStorage.setItem('dsh.ui-aqua.whale', 'false')
-  localStorage.setItem('dsh.ui-aqua.mesh', 'false')
-  const context = {
+/** Fake client context good enough for `AquaLayer`. */
+function makeContext(colorScheme: 'dark' | 'light' = 'dark') {
+  return {
     theme: { getTheme: () => ({ active: { colorScheme } }), overrideTokens: () => () => {} },
     on: () => () => {},
     effect: (setup: () => (() => void) | void) => {
@@ -54,7 +51,24 @@ function createLayer(wallpaper: string, colorScheme: 'dark' | 'light' = 'dark'):
       return dispose
     },
   }
-  return new AquaLayer(context as unknown as Context)
+}
+
+/** Build a layer directly from whatever is already in localStorage. */
+function layerFromStorage(colorScheme: 'dark' | 'light' = 'dark'): AquaLayer {
+  return new AquaLayer(makeContext(colorScheme) as unknown as Context)
+}
+
+/** One wallpaper slot with the given image and default knobs. */
+function slot(image = '') {
+  return { image, blur: 0, frost: 0, videoBlur: 6, videoBrightness: 45 }
+}
+
+function createLayer(wallpaper: string, colorScheme: 'dark' | 'light' = 'dark'): AquaLayer {
+  localStorage.setItem('dsh.ui-aqua.background', 'wallpaper')
+  localStorage.setItem('dsh.ui-aqua.wallpaper', wallpaper)
+  localStorage.setItem('dsh.ui-aqua.whale', 'false')
+  localStorage.setItem('dsh.ui-aqua.mesh', 'false')
+  return layerFromStorage(colorScheme)
 }
 
 beforeEach(() => {
@@ -115,7 +129,93 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+describe('per-scheme wallpapers', () => {
+  const DARK_IMAGE = 'data:image/png;base64,ZGFyaw=='
+  const LIGHT_IMAGE = 'data:image/png;base64,bGlnaHQ='
+  const lightKey = 'dsh.ui-aqua.wallpaperLight'
+  const darkKey = 'dsh.ui-aqua.wallpaper'
+
+  it('reads light and dark wallpapers from separate keys', () => {
+    localStorage.setItem('dsh.ui-aqua.background', 'wallpaper')
+    localStorage.setItem(darkKey, JSON.stringify(slot(DARK_IMAGE)))
+    localStorage.setItem(lightKey, JSON.stringify(slot(LIGHT_IMAGE)))
+    const layer = layerFromStorage('dark')
+    expect(layer.getSettings().wallpapers.dark.image).toBe(DARK_IMAGE)
+    expect(layer.getSettings().wallpapers.light.image).toBe(LIGHT_IMAGE)
+  })
+
+  it('edits only the scheme it is given', () => {
+    const layer = createLayer(DARK_IMAGE)
+    layer.setWallpaper(LIGHT_IMAGE, 'light')
+    layer.setVideoBlur(12, 'light')
+    expect(layer.getSettings().wallpapers.light).toEqual({ ...slot(LIGHT_IMAGE), videoBlur: 12 })
+    expect(layer.getSettings().wallpapers.dark).toEqual(slot(DARK_IMAGE))
+  })
+
+  it('keeps the live backdrop on the active scheme and falls back to fluid when it is unset', () => {
+    localStorage.setItem('dsh.ui-aqua.background', 'wallpaper')
+    localStorage.setItem(lightKey, JSON.stringify(slot(LIGHT_IMAGE)))
+    const layer = layerFromStorage('dark')
+    // Dark mode is active and its slot is empty: no wallpaper paints the page.
+    expect(layer.getSettings().wallpapers.light.image).toBe(LIGHT_IMAGE)
+    expect(document.documentElement.hasAttribute('data-dsh-aqua-wallpaper')).toBe(false)
+    expect(document.querySelector('[data-dsh-aqua-wallpaper-img]')?.hasAttribute('src')).toBe(false)
+  })
+
+  it('drives the knob CSS variables from the active scheme only', () => {
+    localStorage.setItem('dsh.ui-aqua.background', 'wallpaper')
+    localStorage.setItem(darkKey, JSON.stringify({ image: DARK_IMAGE, blur: 8, frost: 30, videoBlur: 4, videoBrightness: 20 }))
+    localStorage.setItem(lightKey, JSON.stringify({ image: LIGHT_IMAGE, blur: 22, frost: 90, videoBlur: 1, videoBrightness: 95 }))
+    layerFromStorage('dark')
+    expect(document.documentElement.style.getPropertyValue('--dsh-aqua-wallpaper-blur')).toBe('8px')
+    expect(document.documentElement.style.getPropertyValue('--dsh-aqua-wallpaper-frost')).toBe('0.3')
+    expect(document.documentElement.style.getPropertyValue('--dsh-aqua-video-blur')).toBe('4px')
+    expect(document.documentElement.style.getPropertyValue('--dsh-aqua-video-dim')).toBe(String((80 / 100) * 0.65))
+  })
+
+  it('migrates the legacy raw string and knob keys into both slots', () => {
+    localStorage.setItem('dsh.ui-aqua.background', 'wallpaper')
+    localStorage.setItem(darkKey, DARK_IMAGE)
+    localStorage.setItem('dsh.ui-aqua.wallpaperBlur', '12')
+    localStorage.setItem('dsh.ui-aqua.wallpaperFrost', '34')
+    localStorage.setItem('dsh.ui-aqua.videoBlur', '9')
+    localStorage.setItem('dsh.ui-aqua.videoBrightness', '70')
+    const layer = layerFromStorage('dark')
+    const migrated = { image: DARK_IMAGE, blur: 12, frost: 34, videoBlur: 9, videoBrightness: 70 }
+    // The pre-split wallpaper seeds the light slot too, so an upgrade looks
+    // unchanged in either scheme; it is persisted so later edits stay apart.
+    expect(layer.getSettings().wallpapers.dark).toEqual(migrated)
+    expect(layer.getSettings().wallpapers.light).toEqual(migrated)
+    expect(JSON.parse(localStorage.getItem(lightKey) ?? 'null')).toEqual(migrated)
+    expect(document.documentElement.style.getPropertyValue('--dsh-aqua-wallpaper-blur')).toBe('12px')
+  })
+
+  it('keeps a cleared light slot empty instead of re-seeding it from dark', () => {
+    localStorage.setItem('dsh.ui-aqua.background', 'wallpaper')
+    localStorage.setItem(darkKey, JSON.stringify(slot(DARK_IMAGE)))
+    localStorage.setItem(lightKey, JSON.stringify(slot('')))
+    const layer = layerFromStorage('light')
+    expect(layer.getSettings().wallpapers.light.image).toBe('')
+    // Light mode is active and its slot is empty, so the fluid board shows.
+    expect(document.documentElement.hasAttribute('data-dsh-aqua-wallpaper')).toBe(false)
+  })
+
+  it('loads the remembered video handle for the active scheme', async () => {
+    createLayer('fsa:example.mp4')
+    await waitFor(() => expect(loadVideoHandle).toHaveBeenCalledWith('dark'))
+  })
+
+  it('plays the seeded legacy video in light mode through the old handle', async () => {
+    createLayer('fsa:example.mp4', 'light')
+    await waitFor(() => expect(loadVideoHandle).toHaveBeenCalledWith('light'))
+    await waitFor(() => {
+      expect(document.querySelector('[data-dsh-aqua-wallpaper-video]')?.getAttribute('src')).toBe('blob:aqua-video')
+    })
+  })
+})
+
 describe('video wallpaper', () => {
+
   it.each(['idb:video-id', 'fsa:example.mp4'])('restores %s after switching away and back', async wallpaper => {
     const layer = createLayer(wallpaper)
     const video = document.querySelector<HTMLVideoElement>('[data-dsh-aqua-wallpaper-video]')!

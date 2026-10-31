@@ -11,9 +11,12 @@ function renderRow(enabled: boolean) {
   const setEnabled = vi.fn()
   const state = {
     enabled, mode: 'mica', blur: 20, frost: 7, fluidHue: 320, fluidDepth: 25,
-    bgBrightness: 50, dark: false, background: 'fluid', wallpaper: '', whale: true,
-    critters: true, mesh: true, spotlight: true, press: true, wallpaperBlur: 0,
-    wallpaperFrost: 0, videoBlur: 6, videoBrightness: 45,
+    bgBrightness: 50, dark: false, background: 'fluid',
+    wallpapers: {
+      light: { image: '', blur: 0, frost: 0, videoBlur: 6, videoBrightness: 45 },
+      dark: { image: '', blur: 0, frost: 0, videoBlur: 6, videoBrightness: 45 },
+    },
+    whale: true, critters: true, mesh: true, spotlight: true, press: true,
   }
   const noop = () => {}
   render(<AquaAppearanceRow {...({

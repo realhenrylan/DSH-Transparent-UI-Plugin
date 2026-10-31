@@ -9,8 +9,9 @@ const DB_NAME = 'dsh-aqua-media'
 const STORE = 'wallpaper'
 const DB_VERSION = 1
 
-/** Fixed key holding the File System Access handle (the browser's remembered
- *  file authorization — the closest the web allows to "remember the path"). */
+/** Key prefix for the File System Access handles (the browser's remembered
+ *  file authorization — the closest the web allows to "remember the path").
+ *  One handle per color scheme: light and dark may remember different files. */
 const HANDLE_KEY = 'videoHandle'
 
 declare global {
@@ -88,13 +89,18 @@ export async function deleteVideoBlob(id: string): Promise<void> {
   }
 }
 
+/** Storage key of one scheme's remembered handle. */
+function handleKey(scheme: 'light' | 'dark'): string {
+  return `${HANDLE_KEY}:${scheme}`
+}
+
 /** Persist a File System Access handle so the next visit can re-read the
  *  ORIGINAL file without the user picking it again. */
-export async function saveVideoHandle(handle: FileSystemFileHandle): Promise<boolean> {
+export async function saveVideoHandle(handle: FileSystemFileHandle, scheme: 'light' | 'dark'): Promise<boolean> {
   try {
     const db = await openDb()
     await new Promise<void>((resolve, reject) => {
-      const request = tx(db, 'readwrite').put(handle, HANDLE_KEY)
+      const request = tx(db, 'readwrite').put(handle, handleKey(scheme))
       request.onsuccess = () => { resolve() }
       request.onerror = () => { reject(request.error ?? new Error('handle put failed')) }
     })
@@ -105,17 +111,29 @@ export async function saveVideoHandle(handle: FileSystemFileHandle): Promise<boo
   }
 }
 
-/** Load the remembered file handle (null when absent or storage fails). */
-export async function loadVideoHandle(): Promise<FileSystemFileHandle | null> {
+/** Load one scheme's remembered file handle (null when absent or storage fails). */
+export async function loadVideoHandle(scheme: 'light' | 'dark'): Promise<FileSystemFileHandle | null> {
   try {
     const db = await openDb()
-    const handle = await new Promise<FileSystemFileHandle | undefined>((resolve, reject) => {
-      const request = tx(db, 'readonly').get(HANDLE_KEY) as IDBRequest<FileSystemFileHandle | undefined>
-      request.onsuccess = () => { resolve(request.result) }
-      request.onerror = () => { reject(request.error ?? new Error('handle get failed')) }
-    })
+    const read = async (key: string): Promise<FileSystemFileHandle | null> => {
+      const handle = await new Promise<FileSystemFileHandle | undefined>((resolve, reject) => {
+        const request = tx(db, 'readonly').get(key) as IDBRequest<FileSystemFileHandle | undefined>
+        request.onsuccess = () => { resolve(request.result) }
+        request.onerror = () => { reject(request.error ?? new Error('handle get failed')) }
+      })
+      return handle ?? null
+    }
+    const stored = await read(handleKey(scheme))
+    if (stored !== null) {
+      db.close()
+      return stored
+    }
+    // Pre-split installs kept a single handle. The migration copies that
+    // wallpaper into both slots, so either scheme may resolve the old key
+    // until it picks its own file (which then writes the per-scheme key).
+    const legacy = await read(HANDLE_KEY)
     db.close()
-    return handle ?? null
+    return legacy
   } catch {
     return null
   }

@@ -4,6 +4,7 @@
  * the only writer; the row component reads via props.useStore.
  */
 import { type EngineStoreHandle } from '@deepseek-ai/dsh-client-store';
+import type { AquaScheme, AquaWallpaperSettings } from './theme-layer.ts';
 /** Store state mirrored from the Aqua settings scope. */
 export interface AquaRowState {
     /** Persisted layer enable flag. */
@@ -24,8 +25,8 @@ export interface AquaRowState {
     dark: boolean;
     /** Backdrop source: fluid board or custom wallpaper. */
     background: 'fluid' | 'wallpaper';
-    /** Wallpaper image data URL. */
-    wallpaper: string;
+    /** Per-scheme wallpaper slots; the active scheme decides which one paints. */
+    wallpapers: Record<AquaScheme, AquaWallpaperSettings>;
     /** Particle whale in the chat area center. */
     whale: boolean;
     /** Ambient marine life (fish / bubbles / plankton). */
@@ -36,14 +37,6 @@ export interface AquaRowState {
     spotlight: boolean;
     /** Hover press-down for the glass panes. */
     press: boolean;
-    /** Wallpaper blur radius, px. */
-    wallpaperBlur: number;
-    /** Wallpaper frost veil, 0-100. */
-    wallpaperFrost: number;
-    /** Video wallpaper blur radius, px. */
-    videoBlur: number;
-    /** Video wallpaper brightness, 0-100. */
-    videoBrightness: number;
     /** Monotonic revision; -1 until first sync so revision 0 lands as a change. */
     revision: number;
 }
@@ -58,16 +51,12 @@ export interface AquaSettingsPayload {
     bgBrightness: number;
     dark: boolean;
     background: 'fluid' | 'wallpaper';
-    wallpaper: string;
+    wallpapers: Record<AquaScheme, AquaWallpaperSettings>;
     whale: boolean;
     critters: boolean;
     mesh: boolean;
     spotlight: boolean;
     press: boolean;
-    wallpaperBlur: number;
-    wallpaperFrost: number;
-    videoBlur: number;
-    videoBrightness: number;
 }
 /** Declared action shape giving the exported factory a stable return type. */
 type AquaRowActions = {
