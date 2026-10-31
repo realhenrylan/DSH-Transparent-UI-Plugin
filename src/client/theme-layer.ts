@@ -508,6 +508,7 @@ export class AquaLayer {
   private videoBlobId: string | undefined
   /** Only the most recent asynchronous video load may update the element. */
   private videoLoadId = 0
+  private readonly listeners = new Set<() => void>()
   private readonly ctx: Context
 
   /**
@@ -517,15 +518,22 @@ export class AquaLayer {
     this.ctx = ctx
     ctx.effect(() => {
       const onStorage = (event: StorageEvent): void => {
-        if (event.key === AQUA_ENABLED_KEY) {
-          this.enabled = readEnabled()
-          this.sync()
-        }
         const key = event.key
-        if (key !== null && (key in NUMERIC_KEYS || key === BACKGROUND_KEY || key === WALLPAPER_KEY || key === MODE_KEY || key === WHALE_KEY || key === CRITTERS_KEY || key === MESH_KEY || key === SPOTLIGHT_KEY || key === PRESS_KEY)) {
-          this.reloadSettings()
-          if (this.enabled) { this.applySettings(); this.applyTokens(); this.applyFluidPalettes(); this.syncWhale() }
+        if (key === null || key === AQUA_ENABLED_KEY) {
+          const enabled = readEnabled()
+          if (enabled !== this.enabled) {
+            this.enabled = enabled
+            this.sync()
+          }
         }
+        const settingsChanged = key === null || Object.values<string>(NUMERIC_KEYS).includes(key)
+          || key === BACKGROUND_KEY || key === WALLPAPER_KEY || key === MODE_KEY || key === WHALE_KEY
+          || key === CRITTERS_KEY || key === MESH_KEY || key === SPOTLIGHT_KEY || key === PRESS_KEY
+        if (settingsChanged) {
+          this.reloadSettings()
+          if (this.enabled) { this.applySettings(); this.applyTokens(); this.applyFluidPalettes(); this.syncWhale(); this.syncMesh() }
+        }
+        if (settingsChanged || key === AQUA_ENABLED_KEY) this.listeners.forEach(listener => { listener() })
       }
       window.addEventListener('storage', onStorage)
       // Follow the Appearance switch: the brightness knob's half-range and
@@ -555,6 +563,12 @@ export class AquaLayer {
   /** Current enable state (the settings row mirrors this). */
   getEnabled(): boolean {
     return this.enabled
+  }
+
+  /** Notify the settings row when another window changes persisted state. */
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener)
+    return () => { this.listeners.delete(listener) }
   }
 
   /** Current knob values (the settings row mirrors these). */

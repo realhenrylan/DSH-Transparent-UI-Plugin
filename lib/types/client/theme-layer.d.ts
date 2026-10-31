@@ -85,6 +85,7 @@ export declare class AquaLayer {
     private videoBlobId;
     /** Only the most recent asynchronous video load may update the element. */
     private videoLoadId;
+    private readonly listeners;
     private readonly ctx;
     /**
      * @param ctx - owning client context.
@@ -92,6 +93,8 @@ export declare class AquaLayer {
     constructor(ctx: Context);
     /** Current enable state (the settings row mirrors this). */
     getEnabled(): boolean;
+    /** Notify the settings row when another window changes persisted state. */
+    subscribe(listener: () => void): () => void;
     /** Current knob values (the settings row mirrors these). */
     getSettings(): AquaSettings;
     /** Whether the resolved palette is dark (the brightness knob darkens). */

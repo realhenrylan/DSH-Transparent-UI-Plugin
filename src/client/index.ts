@@ -70,6 +70,7 @@ export function apply(ctx: ClientContext): void {
     appearanceBound?.sync(next, revision)
     revision += 1
   }
+  ctx.effect(() => layer.subscribe(sync), 'ui-aqua: shared settings sync')
   // The Appearance switch flips the brightness knob's half-range; re-sync
   // the row so it re-renders with the new range.
   ctx.effect(() => ctx.on('theme/change', () => { sync() }), 'ui-aqua: appearance scheme sync')

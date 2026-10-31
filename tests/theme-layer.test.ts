@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Context } from '@deepseek-ai/cordis'
 import { AquaLayer } from '../src/client/theme-layer.ts'
 import { loadVideoBlob, loadVideoHandle } from '../src/client/wallpaper-store.ts'
+import { mountMesh } from '../src/client/mesh.ts'
 
 vi.mock('../src/client/critters.ts', () => ({
   ensureAmbientScene: () => {
@@ -27,7 +28,7 @@ vi.mock('../src/client/spotlight.ts', () => ({
   startSpotlight: () => () => {}, SPOTLIGHT_ATTRIBUTE: 'data-dsh-aqua-spotlight', PRESS_ATTRIBUTE: 'data-dsh-aqua-press',
 }))
 vi.mock('../src/client/whale.ts', () => ({ mountWhale: () => ({ dispose: () => {} }) }))
-vi.mock('../src/client/mesh.ts', () => ({ mountMesh: () => ({ dispose: () => {} }) }))
+vi.mock('../src/client/mesh.ts', () => ({ mountMesh: vi.fn(() => ({ dispose: () => {} })) }))
 vi.mock('../src/client/wallpaper-store.ts', () => ({
   deleteVideoBlob: vi.fn(),
   loadVideoBlob: vi.fn(async () => new Blob(['video'], { type: 'video/mp4' })),
@@ -58,6 +59,7 @@ function createLayer(wallpaper: string): AquaLayer {
 
 beforeEach(() => {
   localStorage.clear()
+  vi.clearAllMocks()
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {})
   vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {})
   vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
@@ -65,6 +67,26 @@ beforeEach(() => {
   vi.stubGlobal('cancelAnimationFrame', () => {})
   Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: vi.fn(() => 'blob:aqua-video') })
   Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: vi.fn() })
+})
+
+describe('settings shared by windows', () => {
+  it('applies a numeric setting changed by another window and notifies the controls', () => {
+    const layer = createLayer('')
+    const sync = vi.fn()
+    layer.subscribe(sync)
+    localStorage.setItem('dsh.ui-aqua.blur', '31')
+    window.dispatchEvent(new StorageEvent('storage', { key: 'dsh.ui-aqua.blur', newValue: '31' }))
+    expect(layer.getSettings().blur).toBe(31)
+    expect(document.documentElement.style.getPropertyValue('--dsh-aqua-blur')).toBe('31px')
+    expect(sync).toHaveBeenCalledOnce()
+  })
+
+  it('mounts the mesh when another window enables it', () => {
+    createLayer('')
+    localStorage.setItem('dsh.ui-aqua.mesh', 'true')
+    window.dispatchEvent(new StorageEvent('storage', { key: 'dsh.ui-aqua.mesh', newValue: 'true' }))
+    expect(mountMesh).toHaveBeenCalledOnce()
+  })
 })
 
 afterEach(() => {
