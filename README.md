@@ -1,8 +1,8 @@
-# @deepseek-ai/dsh-client-ui-aqua
+# Aqua Glass Henry
 
 English | [中文](README.zh.md)
 
-# Notice ⚠️: As DSH has been updated, I am unable to promptly update the plugin with the new APIdue to my academic commitments. Please use an alternative agent to replace or repair it yourself to avoid crashes when installing this plugin.
+Adapted for DSH 0.2.1-rc.5 from [WYH66666666's Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin). The historical screenshots below show the original version; layout details can change with DSH.
 
 
 Aqua is a highly customizable glassmorphism theme for the DeepSeek Harness web UI. The header, sidebar, composer, stats line, and trajectory view all become panes of frosted glass. you can put video for wallpaper and Switch it off and the stock UI comes back exactly, with no source changes to DSH itself.
@@ -27,48 +27,30 @@ Aqua is a highly customizable glassmorphism theme for the DeepSeek Harness web U
 
 ## Installation
 
-### Option 1: npm one-liner (recommended)
+In DSH Desktop, open **Plugin management → Add plugin** and enter:
+
+```text
+github:realhenrylan/DSH-Transparent-UI-Plugin#main
+```
+
+Restart DSH Desktop after installation. The package is named `dsh-aqua-glass-henry`; install it using the GitHub address above, since it is not published to npm. If an older Aqua package is already installed in the same profile, remove it first to avoid activating two themes.
+
+Alternatively, use the terminal opened from the DSH Desktop tray:
 
 ```sh
-dsh plugin --profile web add dsh-client-ui-aqua
+dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#main
 ```
 
-Installs the latest version from npm and registers it as a profile plugin layer (`dsh.bundle` patch) — works on every platform. Reload the web UI and it is on.
-
-### Option 2: GitHub installer (fallback)
-
-No npm account and no git needed (falls back to a plain zip download).
-
-**Windows (one command):**
-
-```powershell
-powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest 'https://github.com/WYH66666666/DSH-Transparent-UI-Plugin/raw/main/install.ps1' -OutFile install.ps1; .\install.ps1"
-```
-
-Installs the **latest release** by default. The script links the plugin into the profile's `node_modules` and registers `ui-aqua` in `cordis.patch.yml` (idempotent — safe to run again).
-
-Pin a version or track the dev branch:
-
-```powershell
-.\install.ps1 -Version 'v1.1.0'   # a specific release
-.\install.ps1 -Version 'main'     # the development branch
-```
-
-**macOS / Linux (manual, three steps):**
-
-```sh
-git clone --depth 1 --branch v1.1.0 https://github.com/WYH66666666/DSH-Transparent-UI-Plugin.git
-ln -s "$PWD/DSH" "$DSH_HOME/profiles/node_modules/@deepseek-ai/dsh-client-ui-aqua"
-```
-
-then append to `$DSH_HOME/profiles/web/cordis.patch.yml`:
-
-```yaml
-- insert:
-    - id: ui-aqua
-      name: '@deepseek-ai/dsh-client-ui-aqua'
-```
+For Web, replace `desktop` with `web`. This version declares compatibility with **DSH 0.2.1-rc.5** only.
 
 ## Usage
 
-Reload the web UI. Aqua is **on by default**; the master switch lives in **Settings → Plugins → Glass theme** (same shape as the other plugin cards), and every other control sits directly under **Settings → General → Appearance** (no title of its own): mode, blur/frost (Mica mode), fluid color, background brightness, backdrop (fluid/wallpaper) with its wallpaper controls, and the particle-whale toggle. With the master switch off, the whole control block under Appearance is hidden.
+The master switch and controls are near **Settings → General → Appearance**. The master switch remains visible when the theme is off.
+
+## Development
+
+With Node.js 24, run `npm install`, `npm run build`, `npm run lint`, and `npm test` in the repository. Built files in `lib/` are committed so GitHub installation does not require a build on the user's machine.
+
+## License
+
+This project retains the original repository's [AGPL-3.0 license](LICENSE).

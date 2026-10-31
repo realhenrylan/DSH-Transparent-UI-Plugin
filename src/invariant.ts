@@ -1,13 +1,13 @@
 /**
- * Package-owned invariant companion for `@deepseek-ai/dsh-client-ui-aqua`.
- * @module @deepseek-ai/dsh-client-ui-aqua/invariant
+ * Package-owned invariant companion for `dsh-aqua-glass-henry`.
+ * @module dsh-aqua-glass-henry/invariant
  */
 
 /* jscpd:ignore-start */
 import type { Context } from '@deepseek-ai/cordis'
 import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 
-const PACKAGE_NAME = '@deepseek-ai/dsh-client-ui-aqua'
+const PACKAGE_NAME = 'dsh-aqua-glass-henry'
 
 /** Cordis companion plugin name. */
 export const name = 'client-ui-aqua-invariant'

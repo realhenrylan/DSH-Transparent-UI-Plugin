@@ -6,11 +6,9 @@
  * picker with its two knobs. Every
  * write goes straight through to the layer, so the skin moves live. The
  * controls follow the Appearance cubes directly (no row title of their own),
- * and the whole row renders nothing while the master switch in the Plugins
- * section is off.
+ * and the master switch remains available when the other controls are off.
  */
 import { useRef } from 'react'
-import { IconCheckOutline16 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
 // Type-only: pulls the `settings.general.item` SlotMap merge.
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
@@ -19,8 +17,10 @@ import { loadVideoHandle, saveVideoBlob, saveVideoHandle } from './wallpaper-sto
 import type { createAquaRowStore } from './settings-store.ts'
 import css from './AquaAppearanceRow.module.css'
 
-/** Injected business face: every knob write except the master switch. */
+/** Injected business face for the master switch and every knob. */
 export interface AquaAppearanceRowInjected {
+  /** Switch the glass layer on or off. */
+  setEnabled: (value: boolean) => void
   /** Set the rendering mode. */
   setMode: (value: 'mica' | 'compat') => void
   /** Set the glass blur radius, px. */
@@ -71,7 +71,7 @@ export type AquaAppearanceRowComponentProps =
  */
 export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
   const {
-    t, setMode, setBlur, setFrost, setFluidHue, setFluidDepth, setBgBrightness,
+    t, setEnabled, setMode, setBlur, setFrost, setFluidHue, setFluidDepth, setBgBrightness,
     setBackground, setWallpaper, setWhale, setCritters, setMesh, setSpotlight, setPress,
     setWallpaperBlur, setWallpaperFrost, setVideoBlur, setVideoBrightness, authorizeVideo, useStore,
   } = props
@@ -172,11 +172,18 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
   const bgMax = dark ? 50 : 100
   const bgDisplay = Math.min(bgMax, Math.max(bgMin, bgBrightness))
 
-  // Off = the Plugins master switch is off: leave no trace in General.
-  if (!enabled) return null
-
   return (
     <div className={css.group}>
+      <div className={css.row}>
+        <span className={css.rowLabel}>{t('aqua.title')}</span>
+        <button type="button" role="switch" aria-label={t('aqua.title')}
+          aria-checked={enabled} className={enabled ? css.toggleOn : css.toggle}
+          onClick={() => { setEnabled(!enabled) }}>
+          <span className={css.check}>{enabled && <CheckIcon />}</span>
+          {enabled ? t('aqua.enable') : t('aqua.disable')}
+        </button>
+      </div>
+      {enabled && <>
       {/* 模式 */}
       <div className={css.subGroup}>
         <div className={css.subTitle}>{t('aqua.mode')}</div>
@@ -329,7 +336,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
               onClick={() => { setWhale(!whale) }}
             >
               <span className={css.check}>
-                {whale && <IconCheckOutline16 />}
+                {whale && <CheckIcon />}
               </span>
               {whale ? t('aqua.enable') : t('aqua.disable')}
             </button>
@@ -343,7 +350,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
               onClick={() => { setCritters(!critters) }}
             >
               <span className={css.check}>
-                {critters && <IconCheckOutline16 />}
+                {critters && <CheckIcon />}
               </span>
               {critters ? t('aqua.enable') : t('aqua.disable')}
             </button>
@@ -357,7 +364,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
               onClick={() => { setMesh(!mesh) }}
             >
               <span className={css.check}>
-                {mesh && <IconCheckOutline16 />}
+                {mesh && <CheckIcon />}
               </span>
               {mesh ? t('aqua.enable') : t('aqua.disable')}
             </button>
@@ -379,7 +386,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
                 onClick={() => { setSpotlight(!spotlight) }}
               >
                 <span className={css.check}>
-                  {spotlight && <IconCheckOutline16 />}
+                  {spotlight && <CheckIcon />}
                 </span>
                 {spotlight ? t('aqua.enable') : t('aqua.disable')}
               </button>
@@ -393,7 +400,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
                 onClick={() => { setPress(!press) }}
               >
                 <span className={css.check}>
-                  {press && <IconCheckOutline16 />}
+                  {press && <CheckIcon />}
                 </span>
                 {press ? t('aqua.enable') : t('aqua.disable')}
               </button>
@@ -401,6 +408,14 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
           </div>
         </div>
       )}
+      </>}
     </div>
   )
+}
+
+/** Local icon avoids relying on a removed host icon export. */
+function CheckIcon() {
+  return <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M3.5 8l3 3 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
 }

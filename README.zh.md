@@ -1,8 +1,8 @@
-# @deepseek-ai/dsh-client-ui-aqua
+# Aqua Glass Henry
 
 [English](README.md) | 中文
 
-# 注意⚠️⚠️⚠️（务必仔细阅读）：随着DSH版本更新，本人因学业繁忙无法及时为该插件适配新的API，请自行使用其他agent更换或修理，以免在安装该插件时出现崩溃问题
+基于 [WYH66666666 的 Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) 适配 DSH 0.2.1-rc.5。仓库中的历史截图来自原版，界面细节可能随 DSH 版本变化。
 
 Aqua 是一层高自由度的玻璃质感主题，套在 DeepSeek Harness 网页端。顶栏、侧边栏、输入框、统计行、轨迹视图都成了磨砂玻璃片,你还可以添加视频和图片作为背景。关掉开关就回到原生界面，不改 DSH 任何一行源码。
 
@@ -26,48 +26,30 @@ Aqua 是一层高自由度的玻璃质感主题，套在 DeepSeek Harness 网页
 
 ## 安装
 
-### 方式一：npm 一键安装（推荐）
+在 DSH Desktop 的**插件管理 → 添加插件**中，输入：
+
+```text
+github:realhenrylan/DSH-Transparent-UI-Plugin#main
+```
+
+安装后重启 DSH Desktop。这个版本的包名是 `dsh-aqua-glass-henry`；安装来源是上面的 GitHub 地址，目前不能仅用包名从 npm 安装。若同一配置中已经安装旧版 Aqua，请先卸载旧版，以免两个主题同时生效。
+
+也可以在 DSH Desktop 托盘打开的终端中运行：
 
 ```sh
-dsh plugin --profile web add dsh-client-ui-aqua
+dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#main
 ```
 
-从 npm 安装最新版，自动注册为 profile 插件层（`dsh.bundle` 补丁），所有平台通用。刷新 Web 界面即可。
-
-### 方式二：GitHub 安装器（备用）
-
-不需要 npm、不需要 git（自动退回 zip 下载）。
-
-**Windows（一条命令）：**
-
-```powershell
-powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest 'https://github.com/WYH66666666/DSH-Transparent-UI-Plugin/raw/main/install.ps1' -OutFile install.ps1; .\install.ps1"
-```
-
-默认安装**最新发布版**。脚本会把插件链接进 profile 的 `node_modules`，并在 `cordis.patch.yml` 里登记 `ui-aqua`（幂等，重复跑不会重复登记）。
-
-指定版本或跟随开发分支：
-
-```powershell
-.\install.ps1 -Version 'v1.1.0'   # 指定某个发布版
-.\install.ps1 -Version 'main'     # 开发分支
-```
-
-**macOS / Linux（手动，三步）：**
-
-```sh
-git clone --depth 1 --branch v1.1.0 https://github.com/WYH66666666/DSH-Transparent-UI-Plugin.git
-ln -s "$PWD/DSH" "$DSH_HOME/profiles/node_modules/@deepseek-ai/dsh-client-ui-aqua"
-```
-
-然后往 `$DSH_HOME/profiles/web/cordis.patch.yml` 追加：
-
-```yaml
-- insert:
-    - id: ui-aqua
-      name: '@deepseek-ai/dsh-client-ui-aqua'
-```
+Web 版将 `desktop` 改为 `web`。本版本仅声明兼容 DSH **0.2.1-rc.5**；其他版本需要先完成适配。
 
 ## 使用
 
-刷新 Web 界面。Aqua **默认开启**；总开关在 **设置 → 插件 → 玻璃主题**（形状与其他插件卡片一致），其余全部调节在 **设置 → 通用设置 → 外观** 的正下方（无独立标题）：模式、模糊度/磨砂度（云母模式）、流体颜色、背景亮度、背景（流体/壁纸）、壁纸设置，以及粒子鲸鱼开关。总开关关闭时，外观下方的整块调节自动隐藏。
+总开关和调节项都位于 **设置 → 通用设置 → 外观** 附近。主题关闭时，总开关仍然显示，可以重新开启。
+
+## 开发
+
+使用 Node.js 24，在仓库目录执行 `npm install`、`npm run build`、`npm run lint` 和 `npm test`。`lib/` 中的构建结果随仓库提供，GitHub 安装不需要在用户机器上编译。
+
+## 许可
+
+本项目继承原仓库的 [AGPL-3.0 许可](LICENSE)。

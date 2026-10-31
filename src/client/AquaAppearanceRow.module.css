@@ -1,8 +1,8 @@
 /* Aqua row in the General settings section: four titled sub-groups (mode /
  * glass material / background / decorations) that follow the Appearance
  * cubes directly, same hairline separator rhythm as the shipped rows; the
- * section column strips the last one. Nothing renders while the master
- * switch is off. */
+ * section column strips the last one. The master switch stays visible while
+ * the theme is off so it can be enabled again. */
 
 .group {
   display: flex;

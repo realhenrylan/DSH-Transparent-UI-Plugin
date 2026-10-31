@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.4.0
+
+- Adapt the theme and its settings controls to DSH 0.2.1-rc.5; keep the master switch in General settings after the old plugin-card slot was removed.
+- Give the GitHub installation its own package identity and include its activation patch.
+- Replace the obsolete machine-specific build and install scripts; retire the publisher that targeted the original npm package.
+- Make the standalone client build reproducible across clean checkouts.
+- Add regression coverage for DSH 0.2.1-rc.5 installation and the theme switch.
+
 ## v1.3.0
 
 - 视频壁纸全面升级：浏览器原生解码、无进度条、循环播放、铺满裁剪，窗口缩放实时自适应
