@@ -89,6 +89,12 @@ describe('settings shared by windows', () => {
   })
 })
 
+it('clamps color depth to the supported 0–100 range', () => {
+  const layer = createLayer('')
+  layer.setFluidDepth(200)
+  expect(layer.getSettings().fluidDepth).toBe(100)
+})
+
 afterEach(() => {
   for (const dispose of disposers.splice(0)) dispose()
   document.body.innerHTML = ''

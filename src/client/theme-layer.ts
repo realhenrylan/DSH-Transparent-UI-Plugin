@@ -299,7 +299,7 @@ const PRESS_KEY = 'dsh.ui-aqua.press'
 /** Clamp a numeric knob into its sane range. */
 function clampSetting(key: NumericKey, value: number): number {
   const max = key === 'blur' || key === 'wallpaperBlur' || key === 'videoBlur' ? 40
-    : key === 'frost' || key === 'wallpaperFrost' || key === 'bgBrightness' || key === 'videoBrightness' ? 100
+    : key === 'frost' || key === 'fluidDepth' || key === 'wallpaperFrost' || key === 'bgBrightness' || key === 'videoBrightness' ? 100
       : 360
   return Number.isFinite(value) ? Math.min(max, Math.max(0, value)) : SETTINGS_DEFAULTS[key]
 }

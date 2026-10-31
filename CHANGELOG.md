@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Clamp restored color-depth values to the supported range.
 - Keep Windows transcript text below the floating header and title bar.
 - Synchronize controls, numeric settings, and mesh effects between windows.
 - Allow choosing a different video when the previous file is already authorized.
