@@ -45,4 +45,14 @@ describe('desktop conversation background', () => {
     const column = desktopColumn('windows', false)
     expect(getComputedStyle(column).backgroundColor).toBe('rgb(12, 18, 27)')
   })
+
+  it('keeps the Windows transcript below the floating header', () => {
+    desktopColumn('windows', true)
+    document.documentElement.setAttribute('data-dsh-float', '')
+    const phase = document.querySelector('[data-phase]')!
+    phase.innerHTML = '<header>Header</header><div data-conversation-scroll>Conversation</div>'
+    const scroll = phase.querySelector('[data-conversation-scroll]')!
+    expect(getComputedStyle(scroll).marginTop).toBe('0px')
+    expect(getComputedStyle(scroll).paddingTop).toBe('12px')
+  })
 })

@@ -69,6 +69,13 @@
   padding-top: 107px;
 }
 
+/* The Windows title bar reserves space above the client. Pulling the scroll
+   body upward lets transcript text escape above the header into that space. */
+[data-windows-titlebar][data-dsh-float] [data-phase='active'] [data-conversation-scroll] {
+  margin-top: 0;
+  padding-top: 12px;
+}
+
 /* No scrim: the transcript and details sit directly on the (now slightly
    darker) fluid —the fluid itself provides the ground, so no dark veil
    covers either phase. */

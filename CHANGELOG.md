@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Keep Windows transcript text below the floating header and title bar.
 - Synchronize controls, numeric settings, and mesh effects between windows.
 - Allow choosing a different video when the previous file is already authorized.
 - Ignore video wallpaper loads that finish after the theme or background has changed.
