@@ -12,7 +12,7 @@ import { useRef } from 'react'
 import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
 // Type-only: pulls the `settings.general.item` SlotMap merge.
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
-import { fileToDataUrl, Knob, Segmented } from './AquaControls.tsx'
+import { fileToDataUrl, readFileAsDataUrl, Knob, Segmented } from './AquaControls.tsx'
 import { loadVideoHandle, saveVideoBlob, saveVideoHandle } from './wallpaper-store.ts'
 import type { createAquaRowStore } from './settings-store.ts'
 import css from './AquaAppearanceRow.module.css'
@@ -121,7 +121,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
             const file = await handle.getFile()
             void saveVideoBlob(file).then((id) => {
               if (id !== '') setWallpaper(id)
-              else void fileToDataUrl(file).then(setWallpaper)
+              else void readFileAsDataUrl(file).then(setWallpaper)
             })
           }
         } catch {
@@ -277,7 +277,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
                           if (id !== '') {
                             setWallpaper(id)
                           } else {
-                            void fileToDataUrl(file).then(setWallpaper)
+                            void readFileAsDataUrl(file).then(setWallpaper)
                           }
                         })
                       }

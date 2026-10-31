@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Restore video wallpaper playback after switching to the fluid background and back.
+- Preserve the video format when wallpaper storage falls back to a data URL.
 
 ## v1.4.1
 

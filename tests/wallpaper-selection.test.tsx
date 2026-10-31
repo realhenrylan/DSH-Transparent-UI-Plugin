@@ -1,0 +1,59 @@
+// @vitest-environment jsdom
+import React from 'react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { AquaAppearanceRow } from '../src/client/AquaAppearanceRow.tsx'
+import { zh } from '../src/client/locales.ts'
+
+vi.mock('../src/client/AquaControls.tsx', async importOriginal => ({
+  ...await importOriginal<typeof import('../src/client/AquaControls.tsx')>(),
+  // A video must never be passed through the image-only converter.
+  fileToDataUrl: vi.fn(async () => 'data:image/jpeg;base64,converted'),
+}))
+vi.mock('../src/client/wallpaper-store.ts', () => ({
+  loadVideoHandle: vi.fn(async () => null),
+  saveVideoBlob: vi.fn(async () => ''),
+  saveVideoHandle: vi.fn(async () => false),
+}))
+
+function renderWallpaperRow() {
+  const setWallpaper = vi.fn()
+  const state = {
+    enabled: true, mode: 'mica', blur: 20, frost: 7, fluidHue: 320, fluidDepth: 25,
+    bgBrightness: 50, dark: false, background: 'wallpaper', wallpaper: '', whale: true,
+    critters: true, mesh: true, spotlight: true, press: true, wallpaperBlur: 0,
+    wallpaperFrost: 0, videoBlur: 6, videoBrightness: 45,
+  }
+  const noop = () => {}
+  const result = render(<AquaAppearanceRow {...({
+    t: (key: keyof typeof zh) => zh[key], useStore: (select: (s: typeof state) => unknown) => select(state),
+    setWallpaper, setEnabled: noop, setMode: noop, setBlur: noop, setFrost: noop, setFluidHue: noop,
+    setFluidDepth: noop, setBgBrightness: noop, setBackground: noop, setWhale: noop,
+    setCritters: noop, setMesh: noop, setSpotlight: noop, setPress: noop, setWallpaperBlur: noop,
+    setWallpaperFrost: noop, setVideoBlur: noop, setVideoBrightness: noop, authorizeVideo: noop,
+  } as unknown as React.ComponentProps<typeof AquaAppearanceRow>)} />)
+  return { ...result, setWallpaper }
+}
+
+beforeEach(() => { vi.restoreAllMocks() })
+afterEach(() => {
+  cleanup()
+  Reflect.deleteProperty(window, 'showOpenFilePicker')
+})
+
+describe('video selection when IndexedDB is unavailable', () => {
+  it('uses a video data URL from the file input', async () => {
+    const { container, setWallpaper } = renderWallpaperRow()
+    const input = container.querySelector<HTMLInputElement>('input[accept^="video/"]')!
+    fireEvent.change(input, { target: { files: [new File(['test video'], 'test.mp4', { type: 'video/mp4' })] } })
+    await waitFor(() => expect(setWallpaper).toHaveBeenCalledWith('data:video/mp4;base64,dGVzdCB2aWRlbw=='))
+  })
+
+  it('uses a video data URL when a picked file handle cannot be stored', async () => {
+    const file = new File(['test video'], 'test.mp4', { type: 'video/mp4' })
+    Object.defineProperty(window, 'showOpenFilePicker', { configurable: true, value: vi.fn(async () => [{ name: file.name, getFile: async () => file }]) })
+    const { setWallpaper } = renderWallpaperRow()
+    fireEvent.click(screen.getByRole('button', { name: '选择视频' }))
+    await waitFor(() => expect(setWallpaper).toHaveBeenCalledWith('data:video/mp4;base64,dGVzdCB2aWRlbw=='))
+  })
+})

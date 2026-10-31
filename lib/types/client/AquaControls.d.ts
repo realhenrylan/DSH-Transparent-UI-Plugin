@@ -24,5 +24,7 @@ export interface SegmentedProps<T extends string> {
 }
 /** Render a two-button segmented picker. */
 export declare function Segmented<T extends string>({ label, value, options, onSelect }: SegmentedProps<T>): import("react/jsx-runtime").JSX.Element;
-/** Read a file, downscale to ≤1920px, and return a compact JPEG data URL. */
+/** Read a file without changing its media type. */
+export declare function readFileAsDataUrl(file: File): Promise<string>;
+/** Read an image, downscale to ≤1920px, and return a compact JPEG data URL. */
 export declare function fileToDataUrl(file: File): Promise<string>;

@@ -80,14 +80,19 @@ export function Segmented<T extends string>({ label, value, options, onSelect }:
   )
 }
 
-/** Read a file, downscale to ≤1920px, and return a compact JPEG data URL. */
-export async function fileToDataUrl(file: File): Promise<string> {
-  const raw = await new Promise<string>((resolve, reject) => {
+/** Read a file without changing its media type. */
+export function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => { resolve(String(reader.result)) }
     reader.onerror = () => { reject(reader.error) }
     reader.readAsDataURL(file)
   })
+}
+
+/** Read an image, downscale to ≤1920px, and return a compact JPEG data URL. */
+export async function fileToDataUrl(file: File): Promise<string> {
+  const raw = await readFileAsDataUrl(file)
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const im = new Image()
     im.onload = () => { resolve(im) }
