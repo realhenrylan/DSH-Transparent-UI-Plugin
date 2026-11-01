@@ -828,6 +828,21 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
     0 8px 30px rgba(2, 6, 14, 0.32);
 }
 
+/* The global session-header card above also matches the plugin page's title
+   rows: both the main list and the "more" list use a plain <header>. Without
+   this override the card gets sliced twice — a detached header bar sitting
+   inside the page card. Flatten those rows back onto the page and restore
+   their stock top padding (the shell uses it to clear the titlebar). */
+[data-dsh-float] section[data-plugin-panel] > header {
+  margin: 0;
+  padding: calc(28px + var(--dsh-frame-top-clearance, 0px)) 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
 /* ---------- Stats line: the composer card's docked footer (original
    styling). It shares the card's glass blur/width/border; the distinction
    is a hairline divider at the seam plus a slightly more transparent

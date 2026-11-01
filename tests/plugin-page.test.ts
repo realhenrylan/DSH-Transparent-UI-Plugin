@@ -75,6 +75,21 @@ describe('plugin manager page card', () => {
     expect(style.scrollbarGutter).toBe('stable')
   })
 
+  it('flattens the page title header onto the card', () => {
+    const page = mount()
+    const header = page.querySelector('header')!
+    const style = getComputedStyle(header)
+    expect(style.marginTop).toBe('0px')
+    expect(style.borderTopWidth).toBe('0px')
+    expect(style.borderRadius).not.toBe('20px')
+    expect(style.boxShadow).toBe('none')
+
+    const rule = declarationsOf('[data-dsh-float] section[data-plugin-panel] > header {')
+    expect(rule).toMatch(/background:\s*transparent/)
+    expect(rule).toMatch(/backdrop-filter:\s*none/)
+    expect(rule).toMatch(/padding:\s*calc\(28px \+ var\(--dsh-frame-top-clearance/)
+  })
+
   it('switches the card to the dark glass fill', () => {
     const page = mount()
     document.body.setAttribute('data-ds-dark-theme', '')
