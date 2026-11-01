@@ -20,6 +20,13 @@
   font-family: var(--dsh-aqua-font-ui);
 }
 
+/* Host switches use brand-primary for the checked track and a white thumb.
+   The dark brand ink is near-white, so give only checked switches the
+   existing blue action fill without changing branding elsewhere. */
+[data-dsh-aqua] button[role='switch'][aria-checked='true'] {
+  --dsw-alias-brand-primary: var(--dsw-alias-button-primary-fill);
+}
+
 /* ---------- Knobs: the settings row writes --dsh-aqua-blur (px),
    --dsh-aqua-frost (a 0-2 alpha multiplier) and --dsh-aqua-fluid-hue (deg)
    onto <html>. The glass surfaces below consume them, so the sliders move

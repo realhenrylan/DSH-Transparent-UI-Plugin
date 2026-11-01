@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Improve checked switch contrast: use the theme's blue action color for the track so the white thumb stays visible in dark and light appearances.
 - Match the plugin manager page to the scheduled tasks page: the plugins panel now floats as the same frosted card (20px corners, hairline border, soft shadow, backdrop blur) while keeping its own scroll container and a stable scrollbar gutter. Its title rows also sit directly on that card instead of picking up the session-header card as a second, detached bar.
 - Keep the Windows titlebar chrome on screen: the sidebar's glass moved onto a pseudo-element — a `backdrop-filter` on the column made it the containing block of the titlebar's fixed controls, so the collapse/expand toggle rendered inside the card and then vanished, clipped away once the column collapsed to a 0px track.
 - Stop the hover tilt on the sidebar column so its fixed guests (the titlebar controls and the settings overlay) always anchor to the window; the cursor glow still applies.
