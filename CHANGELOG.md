@@ -2,10 +2,12 @@
 
 ## Unreleased
 
+- Match the plugin manager page to the scheduled tasks page: the plugins panel now floats as the same frosted card (20px corners, hairline border, soft shadow, backdrop blur) while keeping its own scroll container and a stable scrollbar gutter.
 - Keep the Windows titlebar chrome on screen: the sidebar's glass moved onto a pseudo-element — a `backdrop-filter` on the column made it the containing block of the titlebar's fixed controls, so the collapse/expand toggle rendered inside the card and then vanished, clipped away once the column collapsed to a 0px track.
 - Stop the hover tilt on the sidebar column so its fixed guests (the titlebar controls and the settings overlay) always anchor to the window; the cursor glow still applies.
 - Separate light and dark wallpapers: each scheme keeps its own wallpaper (image or video) with its own blur/frost/brightness knobs, and switching Appearance swaps the backdrop live; a scheme without a wallpaper falls back to the fluid board, and the existing wallpaper is seeded into both schemes once, so nothing changes visually until you set them apart.
 - Cursor glow: white specular highlight instead of the hue-tinted cyan; the 色调/hue slider now recolors the fluid water only.
+- Rewrite the README in English and Chinese around the current fork: custom diagrams for the two modes, the three floating panels, and the per-scheme wallpaper studio, plus fresh WebP screenshots.
 
 ## v1.4.2
 

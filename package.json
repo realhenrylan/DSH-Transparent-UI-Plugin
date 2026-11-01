@@ -44,7 +44,7 @@
   "scripts": {
     "build": "tsdown && tsc --noEmit false --emitDeclarationOnly --declaration --outDir lib/types",
     "lint": "tsc --noEmit",
-    "test": "node --test tests/package.test.mjs && vitest run tests/appearance.test.tsx tests/desktop-background.test.ts tests/theme-layer.test.ts tests/wallpaper-selection.test.tsx tests/windows-sidebar-chrome.test.ts"
+    "test": "node --test tests/package.test.mjs && vitest run tests/appearance.test.tsx tests/desktop-background.test.ts tests/plugin-page.test.ts tests/theme-layer.test.ts tests/wallpaper-selection.test.tsx tests/windows-sidebar-chrome.test.ts"
   },
   "license": "AGPL-3.0-only",
   "engines": {

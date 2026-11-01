@@ -797,6 +797,37 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   background: transparent;
 }
 
+/* ---------- Plugins: the third main panel. Same floating card recipe as
+   the scheduled tasks page, but this page owns its scroll container instead
+   of an inner pane — so it keeps `overflow: auto` (hiding the root would
+   clip everything below the fold) and reserves the gutter up front so the
+   960px column does not shift when the installed list grows. The section
+   hook is the stable seam the plugin manager renders (`data-plugin-panel`);
+   the module class is build-hashed. ---------- */
+[data-dsh-float] section[data-plugin-panel] {
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  height: calc(100% - 20px);
+  margin: 8px 16px 12px;
+  border: 1px solid rgba(19, 45, 83, 0.26);
+  border-radius: 20px;
+  background: var(--dsh-aqua-glass-card-light);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 10px 34px rgba(19, 45, 83, 0.16);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+[data-dsh-float] body[data-ds-dark-theme] section[data-plugin-panel] {
+  border-color: rgba(148, 180, 220, 0.32);
+  background: var(--dsh-aqua-glass-card-dark);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 30px rgba(2, 6, 14, 0.32);
+}
+
 /* ---------- Stats line: the composer card's docked footer (original
    styling). It shares the card's glass blur/width/border; the distinction
    is a hairline divider at the seam plus a slightly more transparent
