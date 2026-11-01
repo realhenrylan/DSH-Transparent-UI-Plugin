@@ -13,8 +13,9 @@
 /** Pill recipe from the official site (`bg-black/25 text-white/95 …`). */
 const PILL_BG = 'rgba(0, 0, 0, 0.25)'
 const PILL_INK = 'rgba(255, 255, 255, 0.95)'
-/** Same Latin face as the rest of the layer (the pill is English-only). */
-const BADGE_FONT_STACK = "'Space Grotesk Variable', 'Microsoft YaHei', 'PingFang SC', sans-serif"
+/** Same Latin face as the rest of the layer; the pill is English-only, so the
+ *  CJK tail is just the shared serif fallback rather than a sans one. */
+const BADGE_FONT_STACK = "'Space Grotesk Variable', 'Noto Serif SC', 'Songti SC', 'SimSun', serif"
 /** Official gloss ring: 135° white gradient at 1px padding + soft glow. */
 const RING_GRADIENT = 'linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.08) 35%, rgba(255,255,255,0.04) 65%, rgba(255,255,255,0.5) 100%)'
 

@@ -1,7 +1,8 @@
 /* Space Grotesk Variable, self-hosted (base64 data URLs) so the Aqua layer
-   keeps its Latin web face with no shell/fontsource dependency. CJK display
-   text intentionally rides the system serif fallback (Songti/STSong/SimSun) —
-   Noto Serif SC is a multi-MB unicode-range face that cannot ship in a plugin. */
+   keeps its Latin web face with no shell/fontsource dependency. CJK text
+   intentionally rides the system serif fallback (Noto Serif SC, Songti/
+   STSong, SimSun) —Noto Serif SC is a multi-MB unicode-range face that
+   cannot ship in a plugin. */
 @font-face {
   font-family: 'Space Grotesk Variable';
   font-style: normal;

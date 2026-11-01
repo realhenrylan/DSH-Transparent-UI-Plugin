@@ -101,7 +101,7 @@ The composer and statistics line share one piece of glass, so the divider lands 
 | **Glass everywhere** | Menus, context menus, cards, bubbles, popovers, toasts, and the settings panel. |
 | **Deep-sea ambience** | A particle whale (a 2D port of the deepseek.com/harness engine), fish and bubbles, an interactive mesh, soft page-edge fades, and a glossy Harness badge in dark mode. |
 | **Cursor and motion** | White cursor glow and hover tilt on the floating panes; focus rings, text selection, and `prefers-reduced-motion` are respected. |
-| **Typography** | Space Grotesk with a CJK system fallback, serif headings and conversation tree, and a 14/10/8px radius language. |
+| **Typography** | Space Grotesk for Latin with a serif CJK face (Noto Serif SC, Songti/STSong, SimSun), serif headings and conversation tree, and a 14/10/8px radius language. |
 | **One switch** | Turn the theme off and the stock UI comes back; uninstall removes the layer with the plugin. |
 | **Tested** | Regression coverage for installation, the theme switch, backdrop selection, panel geometry, and the Windows sidebar chrome. |
 

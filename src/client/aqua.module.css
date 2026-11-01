@@ -13,10 +13,12 @@
    the frame —lift them too, or the glow never reaches the eye. ---------- */
 [data-dsh-aqua] body {
   background: var(--dsw-alias-bg-base);
-  /* Unified type: Latin/digits resolve to Space Grotesk, CJK to the host
-     system stack (Microsoft YaHei on Windows). Font fallback is per glyph,
-     so a mixed Chinese/English string renders in both faces without
-     language-specific selectors. Code surfaces keep the host monospace. */
+  /* Unified type: Latin/digits resolve to Space Grotesk, CJK to the shared
+     serif stack below (Noto Serif SC where installed, otherwise the
+     platform's song face —Songti SC/STSong on macOS, SimSun on Windows).
+     Font fallback is per glyph, so a mixed Chinese/English string renders in
+     both faces without language-specific selectors. Code surfaces keep the
+     host monospace for Latin and reuse the same serif faces for CJK. */
   font-family: var(--dsh-aqua-font-ui);
 }
 
@@ -34,12 +36,14 @@
    step; the smaller surfaces (stats / bubble / menu / + button) keep their
    own base alphas and only scale by the same frost multiplier. ---------- */
 [data-dsh-aqua] {
-  /* The theme token layer points --dsw-font-family, the brand stack and the
-     document-preview stack here, so every host surface that consumes those
-     tokens gets the same typography as the body rule above. Display
-     headings keep the original serif CJK stack (Noto Serif SC here). */
-  --dsh-aqua-font-ui: 'Space Grotesk Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --dsh-aqua-font-display: 'Space Grotesk Variable', 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  /* The theme token layer points --dsw-font-family, the brand stack, the
+     document-preview stack and the code stack here, so every host surface
+     that consumes those tokens gets the same typography as the body rule
+     above. The CJK serif list is shared by the UI stack, the display stack
+     and the token layer, so Chinese reads as serif everywhere. */
+  --dsh-aqua-font-cjk-serif: 'Noto Serif SC', 'Noto Serif CJK SC', 'Source Han Serif SC', 'Source Han Serif CN', 'Songti SC', 'STSong', 'SimSun', serif;
+  --dsh-aqua-font-ui: 'Space Grotesk Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, var(--dsh-aqua-font-cjk-serif);
+  --dsh-aqua-font-display: 'Space Grotesk Variable', var(--dsh-aqua-font-cjk-serif);
   /* FLAT glass: one even tone per scheme (no vertical gradient — a darker
      bottom stop read as a black fade inside the composer). */
   --dsh-aqua-glass-card-light: color-mix(in srgb, rgb(255 255 255) calc(42% * var(--dsh-aqua-frost, 1)), transparent);
@@ -1082,9 +1086,10 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   background: rgba(110, 155, 232, 0.35);
 }
 
-/* ---------- Display typography: the serif CJK face marks headings and the
-   session tree, so the page reads in two voices —serif headings over the
-   sans body. Space Grotesk keeps Latin/digits in the same stack. ---------- */
+/* ---------- Display typography: one serif voice —headings and the session
+   tree take the display stack (heavier serif cut, tighter tracking), while
+   body copy already sits on the same serif CJK list. Space Grotesk keeps
+   Latin/digits in both stacks. ---------- */
 
 /* Chat text: a 1px halo blurs the backdrop right at the glyph edges (the
    closest CSS can get to "frost the background near the text"), plus a

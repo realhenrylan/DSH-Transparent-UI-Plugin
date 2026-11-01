@@ -35,13 +35,14 @@ export const DEFAULT_ENABLED = true
 /** The layer's identity in the theme override stack (inspection-visible). */
 const OVERRIDE_SOURCE = 'dsh-aqua-glass-henry'
 
-/* Unified UI face: Space Grotesk for Latin/digits, the host system stack for
- * CJK (Microsoft YaHei on Windows, PingFang on macOS). CSS font fallback is
- * per glyph, so one stack covers both scripts — no separate language
- * selectors. The stacks themselves live in aqua.module.css as
- * `--dsh-aqua-font-ui` / `--dsh-aqua-font-display`, the single source shared
- * by the body rule, the display rules and these token overrides. Code stays
- * on the host's own monospace stack. */
+/* Unified type: Space Grotesk for Latin/digits, a serif face for CJK (Noto
+ * Serif SC, then the platform's song face —Songti SC/STSong on macOS, SimSun
+ * on Windows). CSS font fallback is per glyph, so one stack covers both
+ * scripts — no separate language selectors. The stacks themselves live in
+ * aqua.module.css as `--dsh-aqua-font-ui` / `--dsh-aqua-font-display` /
+ * `--dsh-aqua-font-cjk-serif`, the single source shared by the body rule,
+ * the display rules and these token overrides. Code keeps the host's own
+ * monospace faces for Latin/digits and appends the same CJK serif list. */
 
 /** Scheme-invariant override value (applied to both palettes). */
 const both = (value: string): { light: string; dark: string } => ({ light: value, dark: value })
@@ -52,13 +53,17 @@ const both = (value: string): { light: string; dark: string } => ({ light: value
  * the Appearance preference — dark is deep-sea navy, light is cool white-blue.
  */
 export const AQUA_TOKEN_OVERRIDES: ThemeTokenOverrides = {
-  // Typography: Space Grotesk for Latin/digits, host system CJK for body
-  // text, brand and document-preview surfaces. Display headings keep their
-  // own serif CJK stack; code blocks stay on the host monospace stack.
+  // Typography: Space Grotesk for Latin/digits, serif CJK for body text,
+  // headings, brand and document-preview surfaces. The code token keeps the
+  // host's monospace faces for Latin/digits and swaps its CJK tail for the
+  // same serif list — the markdown code tokens on <body> derive from it.
   '--dsw-font-family': both('var(--dsh-aqua-font-ui)'),
   '--dsw-font-family-brand': both('var(--dsh-aqua-font-ui)'),
   '--dsw-font': both('var(--dsh-aqua-font-ui)'),
   '--dsh-font-family-text-default': both('var(--dsh-aqua-font-ui)'),
+  '--dsh-font-family-code-default': both(
+    '"SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, var(--dsh-aqua-font-cjk-serif)',
+  ),
 
   // Backgrounds.
   '--dsw-alias-bg-base': { light: '#F4F8FD', dark: '#0C121B' },
