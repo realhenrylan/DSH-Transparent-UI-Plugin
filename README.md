@@ -200,3 +200,5 @@ The original Aqua theme and the v1.3.0 baseline are by [WYH66666666](https://git
 ## License
 
 [AGPL-3.0](LICENSE), inherited from the original repository.
+
+[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)

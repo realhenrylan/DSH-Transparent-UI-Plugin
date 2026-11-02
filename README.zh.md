@@ -200,3 +200,5 @@ npm test        # node:test + Vitest
 ## 许可
 
 [AGPL-3.0](LICENSE)，继承自原仓库。
+
+[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)
