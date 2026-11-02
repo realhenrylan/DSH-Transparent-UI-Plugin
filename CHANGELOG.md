@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Widen `engines.dsh` from the single tested release to a SemVer range (`>=0.2.1-rc.5 <0.3.0-0`) per the packaging guide, so later 0.2.x releases and 0.3.0 stay installable; the manifest test now probes the range anchor-by-anchor and rejects 0.3.0 prereleases under naive SemVer implementations too.
+- Pin the GitHub install reference to a verified commit in `install.ps1` and both READMEs so pushes to `main` cannot silently change what users run; the pin is updated deliberately with each verified build.
+- Lock the client bundle's externalized-module surface with a manifest test: the built factory may ask the page loader only for `react`, `react/jsx-runtime`, and `@deepseek-ai/dsh-client-store` (the exact set official entries rely on); a guard also freezes the four reviewed inject edges so a non-entry package can never join the graph.
 - Set the whole UI in a serif CJK face: body copy, headings, the conversation tree, settings and markdown code blocks now share one CJK serif stack (Noto Serif SC, then Songti SC/STSong, SimSun); Latin/digits keep Space Grotesk and code blocks keep the host monospace.
 - Improve checked switch contrast: use the theme's blue action color for the track so the white thumb stays visible in dark and light appearances.
 - Match the plugin manager page to the scheduled tasks page: the plugins panel now floats as the same frosted card (20px corners, hairline border, soft shadow, backdrop blur) while keeping its own scroll container and a stable scrollbar gutter. Its title rows also sit directly on that card instead of picking up the session-header card as a second, detached bar.

@@ -120,7 +120,7 @@ Chromium 能记住视频文件的授权；其他浏览器会回落到一份本�
 
 ### 要求
 
-- **DSH 0.2.1-rc.5**，Desktop 或 Web。没有声明兼容其他版本。
+- **DSH 0.2.1-rc.5 或更新、低于 0.3.0**（manifest 声明 `>=0.2.1-rc.5 <0.3.0-0`），Desktop 或 Web。已在 0.2.1-rc.5 上安装验证。
 - 用户机器不需要构建工具：`lib/` 里的编译结果随仓库提交。
 - 只有开发时才需要 Node.js 24。
 
@@ -131,27 +131,27 @@ Chromium 能记住视频文件的授权；其他浏览器会回落到一份本�
 3. 填入来源：
 
 ```text
-github:realhenrylan/DSH-Transparent-UI-Plugin#main
+github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab768700f
 ```
 
 4. 重启 DSH。
 5. 打开 **设置 → 通用设置 → 外观**，找到 **玻璃主题** 并开启。
 
-包名是 `dsh-aqua-glass-henry`。它没有发布到 npm，请用上面的 GitHub 来源安装。
+包名是 `dsh-aqua-glass-henry`。它没有发布到 npm，请用上面的 GitHub 来源安装。来源固定在具体 commit，`main` 被推送也不会悄悄改变你运行的代码；每次经过验证的构建会刻意更新这个固定点。想自行安装其他版本，把固定点换成 tag 或别的 commit SHA。
 
 ### 从 CLI 安装
 
 在 DSH Desktop 托盘打开的终端中运行：
 
 ```sh
-dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#main
+dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab768700f
 ```
 
 Web 版把 `desktop` 换成 `web`。
 
 ### 更新与卸载
 
-重新安装同一个 `#main` 来源并重启 DSH 即可更新。想固定版本，就把 `main` 换成 tag 或 commit。卸载前先关闭主题，再从 **插件管理** 移除；注入层和它的 CSS 会随插件一起消失。
+重新安装同一个固定来源并重启 DSH 即可更新；仓库发布新的验证构建后，把固定点移到新 commit（或自己临时换成 `#main` 跟踪分支，但需要接受推送可能改变运行内容）。卸载前先关闭主题，再从 **插件管理** 移除；注入层和它的 CSS 会随插件一起消失。
 
 ## 使用
 

@@ -120,7 +120,7 @@ Everything lives under **Settings → General → Appearance → Glass theme**. 
 
 ### Requirements
 
-- **DSH 0.2.1-rc.5**, Desktop or Web. No other version is declared compatible.
+- **DSH 0.2.1-rc.5 or later but below 0.3.0** (the manifest declares `>=0.2.1-rc.5 <0.3.0-0`), Desktop or Web. Install-verified on 0.2.1-rc.5.
 - No build tools on the user machine: the compiled client in `lib/` is committed.
 - Node.js 24 only for development.
 
@@ -131,27 +131,27 @@ Everything lives under **Settings → General → Appearance → Glass theme**. 
 3. Enter the source:
 
 ```text
-github:realhenrylan/DSH-Transparent-UI-Plugin#main
+github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab768700f
 ```
 
 4. Restart DSH.
 5. Open **Settings → General → Appearance**, find **Glass theme**, and turn it on.
 
-The package is named `dsh-aqua-glass-henry`. It is not published to npm; install it from the GitHub source above.
+The package is named `dsh-aqua-glass-henry`. It is not published to npm; install it from the GitHub source above. The reference is a pinned commit so pushes to `main` cannot silently change what you run; it is updated deliberately with each verified build. To install a different revision yourself, replace the pinned reference with a tag or another commit SHA.
 
 ### From the CLI
 
 Use the terminal opened from the DSH Desktop tray:
 
 ```sh
-dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#main
+dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab768700f
 ```
 
 For Web, replace `desktop` with `web`.
 
 ### Updating and uninstalling
 
-Reinstall the same `#main` source and restart DSH to update. If you want a frozen build, pin a tag or commit instead of `main`. To uninstall, turn the theme off first, then remove the plugin from **Plugin management**; the injected layer and its CSS go with it.
+Reinstall the same pinned source and restart DSH to update; when the repository ships a new verified build, move your pinned reference to the new commit (or swap in `#main` yourself if you prefer tracking the branch and accept that pushes change what runs). To uninstall, turn the theme off first, then remove the plugin from **Plugin management**; the injected layer and its CSS go with it.
 
 ## Use
 
