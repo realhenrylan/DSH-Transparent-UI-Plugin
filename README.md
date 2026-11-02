@@ -131,7 +131,7 @@ Everything lives under **Settings → General → Appearance → Glass theme**. 
 3. Enter the source:
 
 ```text
-github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab768700f
+github:realhenrylan/DSH-Transparent-UI-Plugin#4602dd811c0ab12ada59a829d8c30d658198c34a
 ```
 
 4. Restart DSH.
@@ -144,7 +144,7 @@ The package is named `dsh-aqua-glass-henry`. It is not published to npm; install
 Use the terminal opened from the DSH Desktop tray:
 
 ```sh
-dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab768700f
+dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#4602dd811c0ab12ada59a829d8c30d658198c34a
 ```
 
 For Web, replace `desktop` with `web`.

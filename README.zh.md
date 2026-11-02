@@ -131,7 +131,7 @@ Chromium 能记住视频文件的授权；其他浏览器会回落到一份本�
 3. 填入来源：
 
 ```text
-github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab768700f
+github:realhenrylan/DSH-Transparent-UI-Plugin#4602dd811c0ab12ada59a829d8c30d658198c34a
 ```
 
 4. 重启 DSH。
@@ -144,7 +144,7 @@ github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab7
 在 DSH Desktop 托盘打开的终端中运行：
 
 ```sh
-dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#2a32c2f87278a527ea4b5d0e3d302f8ab768700f
+dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#4602dd811c0ab12ada59a829d8c30d658198c34a
 ```
 
 Web 版把 `desktop` 换成 `web`。
