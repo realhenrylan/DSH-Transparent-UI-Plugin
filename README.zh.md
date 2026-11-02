@@ -9,6 +9,7 @@
   <img alt="版本 1.4.2" src="https://img.shields.io/badge/version-1.4.2-0b3b4a?style=flat-square">
   <img alt="AGPL-3.0 许可" src="https://img.shields.io/badge/license-AGPL--3.0-0f766e?style=flat-square">
   <img alt="Desktop 与 Web" src="https://img.shields.io/badge/platform-Desktop%20%2B%20Web-134e4a?style=flat-square">
+  <a href="https://github.com/deepseek-ai/deepseek-harness"><img alt="powered by dsh" src="https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white"></a>
 </p>
 
 <p align="center">
@@ -200,5 +201,3 @@ npm test        # node:test + Vitest
 ## 许可
 
 [AGPL-3.0](LICENSE)，继承自原仓库。
-
-[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)

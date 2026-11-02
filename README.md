@@ -9,6 +9,7 @@
   <img alt="Version 1.4.2" src="https://img.shields.io/badge/version-1.4.2-0b3b4a?style=flat-square">
   <img alt="AGPL-3.0 license" src="https://img.shields.io/badge/license-AGPL--3.0-0f766e?style=flat-square">
   <img alt="Desktop and Web" src="https://img.shields.io/badge/platform-Desktop%20%2B%20Web-134e4a?style=flat-square">
+  <a href="https://github.com/deepseek-ai/deepseek-harness"><img alt="powered by dsh" src="https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white"></a>
 </p>
 
 <p align="center">
@@ -200,5 +201,3 @@ The original Aqua theme and the v1.3.0 baseline are by [WYH66666666](https://git
 ## License
 
 [AGPL-3.0](LICENSE), inherited from the original repository.
-
-[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)
