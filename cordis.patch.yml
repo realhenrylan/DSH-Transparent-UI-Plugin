@@ -1,4 +1,4 @@
 # Register the host entry so the desktop or web profile discovers its client.
 - insert:
-    - id: ui-aqua
-      name: 'dsh-aqua-glass-henry'
+    - id: ui-driftglass
+      name: 'dsh-driftglass'

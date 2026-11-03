@@ -1,10 +1,10 @@
 /**
- * Package-owned invariant companion for `dsh-aqua-glass-henry`.
- * @module dsh-aqua-glass-henry/invariant
+ * Package-owned invariant companion for `dsh-driftglass`.
+ * @module dsh-driftglass/invariant
  */
 import type { Context } from '@deepseek-ai/cordis';
 /** Cordis companion plugin name. */
-export declare const name = "client-ui-aqua-invariant";
+export declare const name = "client-ui-driftglass-invariant";
 /** Service required before the companion can reserve package ownership. */
 export declare const inject: string[];
 /**

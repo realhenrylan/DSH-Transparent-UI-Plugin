@@ -1,203 +1,201 @@
-# Aqua Glass Henry
+# Driftglass
 
-[English](README.md) | [中文](README.zh.md)
+[English](README.en.md) | 中文
 
-**Deep-sea glass for the DeepSeek Harness web UI.** Aqua turns the shell into floating frosted panes over a living fluid backdrop — or over your own image or video wallpaper. It is a plugin: DSH's source stays untouched, and one switch puts the stock interface back.
+**给 DeepSeek Harness 桌面端与网页端的一层深海玻璃。** Driftglass 把界面变成浮在实时流体背景上的磨砂玻璃片，也可以换成你自己的图片或视频壁纸。它是一个插件：DSH 源码一行不改，一个开关就能回到原生界面。
 
 <p align="center">
   <img alt="DSH 0.2.1-rc.5" src="https://img.shields.io/badge/DSH-0.2.1--rc.5-0f766e?style=flat-square">
-  <img alt="Version 1.4.2" src="https://img.shields.io/badge/version-1.4.2-0b3b4a?style=flat-square">
-  <img alt="AGPL-3.0 license" src="https://img.shields.io/badge/license-AGPL--3.0-0f766e?style=flat-square">
-  <img alt="Desktop and Web" src="https://img.shields.io/badge/platform-Desktop%20%2B%20Web-134e4a?style=flat-square">
+  <img alt="版本 1.4.2" src="https://img.shields.io/badge/version-1.4.2-0b3b4a?style=flat-square">
+  <img alt="AGPL-3.0 许可" src="https://img.shields.io/badge/license-AGPL--3.0-0f766e?style=flat-square">
+  <img alt="Desktop 与 Web" src="https://img.shields.io/badge/platform-Desktop%20%2B%20Web-134e4a?style=flat-square">
   <a href="https://github.com/deepseek-ai/deepseek-harness"><img alt="powered by dsh" src="https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white"></a>
 </p>
 
 <p align="center">
-  <img src="assets/gallery-dark.webp" alt="Aqua Glass Henry in dark mode: a floating glass sidebar, composer, and a deep teal fluid backdrop" width="100%">
+  <img src="assets/gallery-dark.webp" alt="Driftglass 深色模式：悬浮玻璃侧栏和输入框浮在深青色流体背景上" width="100%">
 </p>
 
-Aqua is a fork of [WYH66666666's Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin), adapted for **DSH 0.2.1-rc.5**. The original material system is still here; what changed is everything needed to make it feel at home in the current Harness — and to carry the same card language into the pages the original never reached.
+*截图来自本项目在 DSH 0.2.1-rc.5 上的实际界面；DSH 自身文案跟随你的语言设置。*
 
-> **About the screenshots.** The gallery and close-ups were captured on the v1.3.0 baseline. The three diagrams are current: they show the two modes, the scheduled-tasks and plugins cards in the current build, and the per-scheme wallpaper controls. DSH's own UI copy follows your locale.
+Driftglass 是 [WYH66666666 的 Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) 的 fork，按 **DSH 0.2.1-rc.5** 重建。原版的材质系统完整保留；这个 fork 把它带进当前的 Harness：一个能安装的包、一层铺到页面边缘的背景、三块主面板共用的一套卡片语言，以及可以分别跟随浅色和深色的壁纸。
 
-## Why this fork
+## 相对 v1.3.0 的改动
 
-Upstream v1.3.0 is the baseline. This fork keeps its look and spends the difference on the shell around it:
-
-| Area | What changed since upstream v1.3.0 |
+| 方面 | 相对 v1.3.0 基线 |
 | --- | --- |
-| **DSH 0.2.1-rc.5** | Rebuilt as a fork with its own package identity, activation patch, and General-settings row. Installation and theme-switch paths have regression tests. |
-| **Desktop backdrop** | Fixed the opaque center column that hid the fluid or wallpaper behind the app. The backdrop now reaches the page edge. |
-| **Wallpaper resilience** | Video loads survive theme and background switches; stale async loads are ignored; an already-authorized file can be replaced; a data-URL fallback keeps the video format. |
-| **Windows chrome** | The titlebar controls stay on screen, transcript text clears the floating header, and the sidebar column no longer tilts, so fixed controls in the titlebar stay anchored. |
-| **Panels** | Scheduled tasks and plugins now join the floating-card family. The plugins page keeps its own scroll container and a stable scrollbar gutter. |
-| **Details** | Sidebar glass aligned with the cards, real glass on the slash-command popover, unified typography, and a white cursor glow instead of the old cyan tint. |
+| **DSH 0.2.1-rc.5** | 以独立包名重建，加入激活补丁和「通用设置」入口；安装与主题切换路径有回归测试。 |
+| **桌面背景** | 遮住流体/壁纸的不透明中栏没了：背景现在铺到悬浮卡片后面的页面边缘。 |
+| **主面板** | 定时任务页和插件管理页加入悬浮卡片家族。插件页保留自己的滚动容器和稳定的滚动条槽。 |
+| **壁纸** | 浅色和深色各自保存图片或视频，也各自有一套模糊、磨砂和亮度参数。 |
+| **视频** | 切换主题和背景后视频仍能继续；过期的异步加载会被丢弃；已授权的文件可以替换；data-URL 兜底会保留视频格式。 |
+| **Windows 窗口** | 标题栏按钮保持原位，会话文字避开悬浮标题区，侧栏不再倾斜。 |
+| **字体与细节** | 中日韩衬线体配 Space Grotesk 拉丁字形、白色鼠标辉光、蓝色选中开关、斜杠命令弹层使用真实玻璃、侧栏玻璃与卡片对齐。 |
+| **多窗口** | 主题、壁纸和环境装饰设置会在多个窗口之间同步。 |
 
-## Two layouts, one material
+## 两种布局，一种材质
 
 <p align="center">
-  <img src="assets/readme-modes.webp" alt="Diagram comparing Mica and Compatibility modes: Mica uses floating cards, Compatibility keeps the stock geometry" width="100%">
+  <img src="assets/readme-modes.webp" alt="Mica 与兼容模式的对比图：Mica 使用悬浮卡片，兼容模式保留原生几何" width="100%">
 </p>
 
-Switch modes live in **Settings → General → Appearance**; no restart is needed.
+在 **设置 → 通用 → 外观** 里即时切换，不需要重启。
 
-| | Mica | Compatibility |
+| | Mica | 兼容模式 |
 | --- | --- | --- |
-| **Layout** | Floating cards: 20px corners, 16px inset around the shell | Stock geometry: no moved panes, no new insets |
-| **Material** | The full frosted-pane recipe over the backdrop | Token-level glass applied to the stock layout |
-| **Coverage** | Header, sidebar, composer + stats, trajectory, and all three main panels | Cards, menus, bubbles, popovers, toasts, the settings panel, and third-party plugin surfaces |
-| **Extras** | Hover tilt and cursor glow | Conservative blur on menus, cards, bubbles, popovers, and panels |
+| **布局** | 悬浮卡片：20px 圆角，外壳四周留 16px | 原生几何：不移动面板，不加新内边距 |
+| **材质** | 在背景上套完整的磨砂玻璃配方 | 把玻璃令牌应用到原生布局 |
+| **覆盖** | 顶栏、侧栏、输入框 + 统计行、轨迹视图，以及三块主面板 | 卡片、菜单、气泡、浮层、Toast、设置面板和第三方插件界面 |
+| **附加** | 悬停下压和鼠标辉光 | 菜单、卡片、气泡、浮层和面板上的保守模糊 |
 
-Mica is the full treatment. Compatibility is the escape hatch for a layout-sensitive day, or for plugins that expect the stock shell.
+Mica 是完整效果；兼容模式是布局敏感时的退路，也适合那些依赖原生外壳的插件。
 
-## One card language
-
-<p align="center">
-  <img src="assets/readme-panels.webp" alt="Chat, Scheduled tasks, and Plugins panels sharing the same rounded glass card recipe" width="100%">
-</p>
-
-All three main panels share one recipe: **20px corners, a 16px inset, a hairline border, an inset top highlight, a soft drop shadow, and backdrop blur**.
-
-- **Chat** — header, sidebar, composer + stats, and the trajectory view float as one family.
-- **Scheduled tasks** — the list and detail live inside a single glass sheet; the inner detail and save footer go transparent so the card reads as one surface.
-- **Plugins** — the plugin manager gets the same card. It owns its scrollport, so it keeps `overflow: auto` and `scrollbar-gutter: stable` instead of clipping content below the fold or shifting the content column when the scrollbar appears.
-
-## The room behind the glass
+## 一套卡片语言
 
 <p align="center">
-  <img src="assets/readme-backdrop.webp" alt="The Background settings card: light and dark wallpaper slots, image blur, frost, brightness, and video brightness" width="100%">
+  <img src="assets/readme-panels.webp" alt="对话、定时任务和插件三块面板共用同一套圆角玻璃卡片配方" width="100%">
 </p>
 
-The default backdrop is a **live fluid shader** with hue and color-depth controls. If you want your own room, switch to **Wallpaper**:
+三块主面板共用一套配方：**20px 圆角、16px 内缩、发丝边框、顶部内高光、柔和投影，以及背景模糊**。
 
-- Each scheme — light and dark — stores its own image or video, plus its own knobs.
-- Image wallpapers get **blur** and **frost**; videos get **blur** and **brightness**.
-- Videos use native decoding, loop, cover the page, and are dimmed automatically so text stays readable.
-- A scheme without a wallpaper falls back to the fluid board. Switching Appearance swaps the backdrop immediately.
-- On the first run after upgrading, an existing wallpaper is seeded into both scheme slots once, so nothing changes until you pull them apart.
+- **对话** — 顶栏、侧栏、输入框 + 统计行和轨迹视图作为同一族悬浮。
+- **定时任务** — 列表和详情放在同一张玻璃片里；内部的详情和保存栏变透明，整张卡片读起来是一个表面。
+- **插件** — 插件管理页也用同一张卡片。它有自己的滚动容器，保留 `overflow: auto` 和 `scrollbar-gutter: stable`，既不会把内容裁在折线以下，也不会在滚动条出现时让内容列跳动。
 
-Chromium can remember a video file's authorization; other browsers fall back to a stored local copy. Background brightness follows the resolved scheme: dark mode darkens from 50 down to 0, light mode brightens from 50 up to 100, and 50 is untouched.
-
-## The look
+## 玻璃背后的房间
 
 <p align="center">
-  <img src="assets/gallery-light.webp" alt="Aqua Glass Henry in light mode over a pale teal wallpaper" width="100%">
+  <img src="assets/readme-backdrop.webp" alt="背景设置卡片：浅色图片槽和深色视频槽，以及图片模糊、磨砂、亮度和视频亮度" width="100%">
 </p>
 
-*Light mode uses the same material and geometry as dark mode, with a brighter fill and a pale-teal wallpaper.*
+默认背景是一块**实时流体着色器**，带色调和颜色深浅控制。想换成自己的房间，就切到**壁纸**：
 
-The composer and statistics line share one piece of glass, so the divider lands exactly on the rounded edge instead of splitting two different blurs:
+- 浅色和深色各自保存自己的图片或视频，也各自有一套旋钮。
+- 图片壁纸有**模糊**和**磨砂**；视频有**模糊**和**亮度**。
+- 视频使用原生解码、循环播放、铺满页面，并自动压暗，保证文字可读。
+- 某个方案没有壁纸时会回落到流体背景。切换外观会立刻换背景，正在绘制页面的那个槽会标为**使用中**。
+- 升级后的第一次运行，会把已有壁纸一次性播种到两个方案槽里，所以在你把它们分开之前，观感不变。
+- 删除正在使用的槽里的媒体，也会把背景切回流体质感。
 
-| Light | Dark |
-| :---: | :---: |
-| <img src="assets/composer-light.webp" alt="Composer and statistics line in light mode" width="100%"> | <img src="assets/composer-dark.webp" alt="Composer and statistics line in dark mode" width="100%"> |
-| <sub>Composer + stats, light</sub> | <sub>Composer + stats, dark</sub> |
+Chromium 可以记住视频文件的授权；其他浏览器会回落到本地存储的副本。背景亮度跟随解析后的方案：深色模式从 50 往下压到 0，浅色模式从 50 往上提到 100，50 保持不变。
 
-## Features
+## 观感
 
-| Feature | What you get |
+<p align="center">
+  <img src="assets/gallery-light.webp" alt="Driftglass 浅色模式，配淡青色流体背景" width="100%">
+</p>
+
+*浅色模式沿用深色模式的材质与几何，只是填充更亮，背景是淡青色流体。*
+
+输入框和统计行共用同一片玻璃，分隔线正好落在圆角边缘上，而不是把两种不同的模糊切成两半。
+
+## 全部能力
+
+| 功能 | 你会得到什么 |
 | --- | --- |
-| **Two modes** | Mica for the floating-card layout, Compatibility for the stock geometry with generic glass. |
-| **Backdrop studio** | Fluid shader, image wallpaper, or video wallpaper — with per-scheme media and independent knobs. |
-| **Glass everywhere** | Menus, context menus, cards, bubbles, popovers, toasts, and the settings panel. |
-| **Deep-sea ambience** | A particle whale (a 2D port of the deepseek.com/harness engine), fish and bubbles, an interactive mesh, soft page-edge fades, and a glossy Harness badge in dark mode. |
-| **Cursor and motion** | White cursor glow and hover tilt on the floating panes; focus rings, text selection, and `prefers-reduced-motion` are respected. |
-| **Typography** | Space Grotesk for Latin with a serif CJK face (Noto Serif SC, Songti/STSong, SimSun), serif headings and conversation tree, and a 14/10/8px radius language. |
-| **One switch** | Turn the theme off and the stock UI comes back; uninstall removes the layer with the plugin. |
-| **Tested** | Regression coverage for installation, the theme switch, backdrop selection, panel geometry, and the Windows sidebar chrome. |
+| **两种模式** | Mica 是悬浮卡片布局；兼容模式保留原生几何，只套通用玻璃。 |
+| **背景工作室** | 流体着色器、图片壁纸或视频壁纸——按方案保存媒体，旋钮各自独立。 |
+| **到处是玻璃** | 菜单、右键菜单、卡片、气泡、浮层、Toast 和设置面板。 |
+| **深海氛围** | 粒子鲸鱼（deepseek.com/harness 引擎的 2D 移植）、小鱼和气泡、交互网格、柔和的页面边缘渐隐，以及深色模式下的光泽 Harness 徽章。 |
+| **光标与动效** | 悬浮面板上的白色鼠标辉光和悬停下压；尊重焦点环、文本选择和 `prefers-reduced-motion`。 |
+| **字体** | 拉丁字母和数字用 Space Grotesk，正文与展示用中日韩衬线体（Noto Serif SC、Songti/STSong、SimSun），标题和会话树用衬线，圆角语言为 14/10/8px。 |
+| **一个开关** | 关掉主题就回到原生界面；卸载插件会一起移除注入层。 |
+| **多窗口** | 打开多个窗口时设置保持同步。 |
+| **有测试** | 七个文件共 52 项检查：包契约、外观、背景、面板、壁纸选择和 Windows 窗口。 |
 
-## Controls
+## 控件
 
-Everything lives under **Settings → General → Appearance → Glass theme**. Defaults are in parentheses; wallpaper knobs appear once media is set.
+全部在 **设置 → 通用 → 外观 → 玻璃主题** 下。括号里是默认值；壁纸旋钮在设置媒体后出现。
 
-| Group | Controls |
+| 分组 | 控件 |
 | --- | --- |
-| **Material** | Mode: Mica / Compatibility · Glass blur 0–40px (20) · Frost 0–100% (7) — blur and frost appear in Mica only |
-| **Backdrop** | Fluid / Wallpaper · Hue 0–360° (320) · Color depth 0–100% (25) · Background brightness 0–50 in dark / 50–100 in light (50) |
-| **Wallpaper** | One slot per scheme · image or video · image blur 0–40px and frost 0–100% · video blur 0–40px and brightness 0–100% · delete · empty falls back to fluid |
-| **Ambience** | Particle whale · Fish · Interactive mesh · Cursor glow · Hover tilt — all on by default |
+| **材质** | 模式：Mica / 兼容模式 · 玻璃模糊度 0–40px（20） · 磨砂度 0–100%（7）——模糊和磨砂只在 Mica 下出现 |
+| **背景** | 流体 / 壁纸 · 色调 0–360°（320） · 颜色深浅 0–100%（25） · 背景亮度：深色 0–50 / 浅色 50–100（50） |
+| **壁纸** | 每个方案一个槽 · 图片或视频 · 图片模糊 0–40px、磨砂 0–100% · 视频模糊 0–40px、亮度 0–100% · 删除 · 为空时回落到流体 |
+| **环境装饰** | 粒子鲸鱼 · 小鱼 · 网状交互——默认全开 |
+| **悬停** | 鼠标辉光 · 悬停下压——默认全开，仅 Mica |
 
-## Install
+## 安装
 
-### Requirements
+### 要求
 
-- **DSH 0.2.1-rc.5 or later but below 0.3.0** (the manifest declares `>=0.2.1-rc.5 <0.3.0-0`), Desktop or Web. Install-verified on 0.2.1-rc.5.
-- No build tools on the user machine: the compiled client in `lib/` is committed.
-- Node.js 24 only for development.
+- **DSH 0.2.1-rc.5 或更高，但低于 0.3.0**（manifest 声明 `>=0.2.1-rc.5 <0.3.0-0`），桌面端或网页端。已在 0.2.1-rc.5 上验证安装。
+- 用户机器不需要构建工具：编译好的客户端已提交在 `lib/`。
+- 只有开发才需要 Node.js 24。
 
-### From DSH
+### 从 DSH 安装
 
-1. If an older Aqua package is installed in the same profile, remove it first so two themes do not fight.
-2. Open **Plugin management → Add plugin**.
-3. Enter the source:
+1. 如果同一个 profile 里还装着旧的 `dsh-aqua-glass-henry` 包，先移除，避免两个主题打架。
+2. 打开 **插件管理 → 添加插件**。
+3. 输入来源：
 
 ```text
-github:realhenrylan/DSH-Transparent-UI-Plugin#4602dd811c0ab12ada59a829d8c30d658198c34a
+github:realhenrylan/DSH-Transparent-UI-Plugin#main
 ```
 
-4. Restart DSH.
-5. Open **Settings → General → Appearance**, find **Glass theme**, and turn it on.
+4. 重启 DSH。
+5. 打开 **设置 → 通用 → 外观**，找到**玻璃主题**并开启。
 
-The package is named `dsh-aqua-glass-henry`. It is not published to npm; install it from the GitHub source above. The reference is a pinned commit so pushes to `main` cannot silently change what you run; it is updated deliberately with each verified build. To install a different revision yourself, replace the pinned reference with a tag or another commit SHA.
+包名是 `dsh-driftglass`。它没有发布到 npm，请用上面的 GitHub 来源安装。来源跟踪 `main`，会安装当前构建；需要冻结版本时，换成 tag 或 commit SHA。主题设置沿用原来的存储键，旧配置的观感会保留。
 
-### From the CLI
+### 从命令行安装
 
-Use the terminal opened from the DSH Desktop tray:
+使用从 DSH 桌面托盘打开的终端：
 
 ```sh
-dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#4602dd811c0ab12ada59a829d8c30d658198c34a
+dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#main
 ```
 
-For Web, replace `desktop` with `web`.
+网页端把 `desktop` 换成 `web`。
 
-### Updating and uninstalling
+### 更新与卸载
 
-Reinstall the same pinned source and restart DSH to update; when the repository ships a new verified build, move your pinned reference to the new commit (or swap in `#main` yourself if you prefer tracking the branch and accept that pushes change what runs). To uninstall, turn the theme off first, then remove the plugin from **Plugin management**; the injected layer and its CSS go with it.
+重装同一来源并重启 DSH 即可更新。保留 `#main` 就跟随分支；需要冻结版本时固定 tag 或 commit SHA。卸载时先关掉主题，再从**插件管理**移除插件；注入的图层和 CSS 会一起消失。
 
-## Use
+## 使用
 
-Open **Settings → General → Appearance**. The master switch sits under **Glass theme** and stays visible when the theme is off, so you can always bring it back.
+打开 **设置 → 通用 → 外观**。总开关在**玻璃主题**下，主题关闭时仍然可见，所以随时能再打开。
 
-- **Mode** changes the layout treatment; **Backdrop** chooses fluid or wallpaper.
-- **Wallpaper** has a separate block for light and dark. Pick the scheme you are editing, then choose an image or video.
-- If a video does not start after a reload, click **Choose video** once — the host needs a fresh file grant.
-- If the theme is installed but invisible, check the master switch before reinstalling.
+- **模式**改变布局处理；**背景**选择流体或壁纸。
+- **壁纸**有独立的浅色和深色区块。正在绘制页面的区块会标为**使用中**；编辑任一块，然后选择图片或视频。
+- 如果重载后视频没有开始播放，点一次**选择视频**——宿主需要重新授权文件。
+- 如果装了主题却看不到，先检查总开关，再考虑重装。
 
-## Compatibility
+## 兼容性
 
 | | |
 | --- | --- |
-| **DSH** | 0.2.1-rc.5 only (the version declared in `package.json`) |
-| **Hosts** | Desktop and Web |
-| **Browsers** | Chromium recommended for video wallpapers; other browsers fall back to a stored copy |
-| **Other plugins** | Compatibility mode extends the glass material to third-party surfaces |
-| **Caveat** | DSH DOM changes can still move a stable hook. The theme uses the most stable seams it can, but another DSH release may need an update |
+| **DSH** | 0.2.1-rc.5 或更高，低于 0.3.0（`>=0.2.1-rc.5 <0.3.0-0`） |
+| **宿主** | 桌面端和网页端 |
+| **浏览器** | 视频壁纸推荐 Chromium；其他浏览器回落到存储副本 |
+| **其他插件** | 兼容模式会把玻璃材质扩展到第三方界面 |
+| **注意事项** | DSH 的 DOM 变化仍可能移动稳定钩子。主题尽量使用最稳定的接缝，但另一个 DSH 版本可能仍需要适配 |
 
-## Development
+## 开发
 
-Node.js 24:
+Node.js 24：
 
 ```sh
 npm install
-npm run build   # tsdown + declaration emit
+npm run build   # tsdown + 声明文件
 npm run lint    # tsc --noEmit
-npm test        # node:test + Vitest suites
+npm test        # node:test + Vitest
 ```
 
-The compiled `lib/` output is committed so GitHub installations do not compile on the user's machine.
+编译产物 `lib/` 已提交，所以从 GitHub 安装时不会在用户机器上编译。
 
-A quick map:
+快速索引：
 
-- `src/client/theme-layer.ts` — state, lifecycle, document attributes, CSS variables.
-- `src/client/aqua.module.css` — the theme layer and panel recipes.
-- `src/client/AquaAppearanceRow.tsx` — the settings row and wallpaper controls.
-- `src/client/wallpaper-store.ts` — per-scheme media persistence.
-- `tests/` — package checks plus Vitest coverage for appearance, backdrops, panels, and Windows chrome.
+- `src/client/theme-layer.ts` —— 状态、生命周期、文档属性、CSS 变量。
+- `src/client/aqua.module.css` —— 主题层与面板配方（内部 Aqua 命名空间为兼容保留）。
+- `src/client/AquaAppearanceRow.tsx` —— 设置行、按方案保存的壁纸区块和壁纸控件。
+- `src/client/wallpaper-store.ts` —— 按方案保存媒体。
+- `tests/` —— 包检查，以及外观、背景、面板、壁纸选择和 Windows 窗口的 Vitest 覆盖。
 
-## Credits
+## 致谢
 
-The original Aqua theme and the v1.3.0 baseline are by [WYH66666666](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin). This fork is maintained by [realhenrylan](https://github.com/realhenrylan). DeepSeek Harness and the particle-whale design belong to DeepSeek. This project is not affiliated with DeepSeek.
+Driftglass 基于 [WYH66666666](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) 制作的原创 **Aqua** 主题及其 **v1.3.0 基线**。项目由 [realhenrylan](https://github.com/realhenrylan) 维护。DeepSeek Harness 和粒子鲸鱼设计归 DeepSeek 所有。本项目与 DeepSeek 没有隶属关系。
 
-## License
+## 许可
 
-[AGPL-3.0](LICENSE), inherited from the original repository.
+[AGPL-3.0](LICENSE)，继承自原仓库。

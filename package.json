@@ -1,6 +1,6 @@
 {
-  "name": "dsh-aqua-glass-henry",
-  "description": "Aqua glass theme adapted for DSH 0.2.1-rc.5 desktop and web",
+  "name": "dsh-driftglass",
+  "description": "Deep-sea glass theme for DSH 0.2.1-rc.5 desktop and web",
   "version": "1.4.2",
   "publishConfig": {
     "access": "public"

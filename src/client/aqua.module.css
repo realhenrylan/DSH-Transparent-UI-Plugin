@@ -973,9 +973,11 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
 }
 
 /* ---------- Sidebar: the selected session gets an accent bar and a soft halo. ---------- */
+/* The bar reads the business-blue token directly: active-accent is a tint now
+   (the question chip reuses it as a background), so it would be invisible here. */
 [data-dsh-float] [role='treeitem'][aria-selected='true'] {
   box-shadow:
-    inset 2px 0 0 var(--dsw-specific-sidebar-nav-item-active-accent),
+    inset 2px 0 0 var(--dsw-alias-state-business-primary),
     0 0 16px rgba(110, 155, 232, 0.14);
 }
 

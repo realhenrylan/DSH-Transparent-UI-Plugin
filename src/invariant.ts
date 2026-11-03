@@ -1,16 +1,16 @@
 /**
- * Package-owned invariant companion for `dsh-aqua-glass-henry`.
- * @module dsh-aqua-glass-henry/invariant
+ * Package-owned invariant companion for `dsh-driftglass`.
+ * @module dsh-driftglass/invariant
  */
 
 /* jscpd:ignore-start */
 import type { Context } from '@deepseek-ai/cordis'
 import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 
-const PACKAGE_NAME = 'dsh-aqua-glass-henry'
+const PACKAGE_NAME = 'dsh-driftglass'
 
 /** Cordis companion plugin name. */
-export const name = 'client-ui-aqua-invariant'
+export const name = 'client-ui-driftglass-invariant'
 /** Service required before the companion can reserve package ownership. */
 export const inject = ['invariants']
 

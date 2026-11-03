@@ -82,7 +82,7 @@ test('the package declares a DSH engine range consistent with the install flow',
 })
 
 test('the GitHub package activates its own bundle on installation', () => {
-  assert.equal(manifest.name, 'dsh-aqua-glass-henry')
+  assert.equal(manifest.name, 'dsh-driftglass')
   assert.equal(manifest.dsh?.bundle?.patch, './cordis.patch.yml')
   assert.ok(manifest.files.includes('cordis.patch.yml'))
   assert.match(patch, new RegExp(`name: ['"]?${manifest.name}['"]?`))

@@ -33,7 +33,7 @@ export const AQUA_ENABLED_KEY = 'dsh.ui-aqua.enabled'
 export const DEFAULT_ENABLED = true
 
 /** The layer's identity in the theme override stack (inspection-visible). */
-const OVERRIDE_SOURCE = 'dsh-aqua-glass-henry'
+const OVERRIDE_SOURCE = 'dsh-driftglass'
 
 /* Unified type: Space Grotesk for Latin/digits, a serif face for CJK (Noto
  * Serif SC, then the platform's song face —Songti SC/STSong on macOS, SimSun
@@ -153,7 +153,10 @@ export const AQUA_TOKEN_OVERRIDES: ThemeTokenOverrides = {
   '--dsw-specific-sidebar-fill': { light: 'transparent', dark: 'transparent' },
   '--dsw-specific-sidebar-nav-item-active': { light: '#DEE9F8', dark: '#1B283A' },
   '--dsw-specific-sidebar-nav-item-hover': { light: '#E9F0F8', dark: '#15202F' },
-  '--dsw-specific-sidebar-nav-item-active-accent': { light: '#3F76D8', dark: '#6E9BE8' },
+  // Tint, not fill: the user-question "recommended" chip paints this token as
+  // its background while its text uses --dsw-alias-button-info-fill, so a blue
+  // value here would swallow the label (background === color).
+  '--dsw-specific-sidebar-nav-item-active-accent': { light: '#DCE9FB', dark: '#1D2C44' },
   '--dsw-specific-input-major': { light: '#FFFFFF', dark: '#101927' },
   '--dsw-specific-login-input': { light: '#F0F5FB', dark: '#0D141F' },
   '--dsw-specific-menu': { light: '#EAF1F9', dark: '#162130' },
