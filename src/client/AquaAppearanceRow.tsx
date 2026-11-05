@@ -106,7 +106,7 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
 
   return (
     <div className={css.group}>
-      <div className={css.row}>
+      <div className={css.masterRow}>
         <span className={css.rowLabel}>{t('aqua.title')}</span>
         <button type="button" role="switch" aria-label={t('aqua.title')}
           aria-checked={enabled} className={enabled ? css.toggleOn : css.toggle}

@@ -5,8 +5,8 @@
 **给 DeepSeek Harness 桌面端与网页端的一层深海玻璃。** Driftglass 把界面变成浮在实时流体背景上的磨砂玻璃片，也可以换成你自己的图片或视频壁纸。它是一个插件：DSH 源码一行不改，一个开关就能回到原生界面。
 
 <p align="center">
-  <img alt="DSH 0.2.1-rc.5" src="https://img.shields.io/badge/DSH-0.2.1--rc.5-0f766e?style=flat-square">
-  <img alt="版本 1.4.2" src="https://img.shields.io/badge/version-1.4.2-0b3b4a?style=flat-square">
+  <img alt="DSH 0.2.2-rc.1" src="https://img.shields.io/badge/DSH-0.2.2--rc.1-0f766e?style=flat-square">
+  <img alt="版本 1.5.0" src="https://img.shields.io/badge/version-1.5.0-0b3b4a?style=flat-square">
   <img alt="AGPL-3.0 许可" src="https://img.shields.io/badge/license-AGPL--3.0-0f766e?style=flat-square">
   <img alt="Desktop 与 Web" src="https://img.shields.io/badge/platform-Desktop%20%2B%20Web-134e4a?style=flat-square">
   <a href="https://github.com/deepseek-ai/deepseek-harness"><img alt="powered by dsh" src="https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white"></a>
@@ -16,15 +16,15 @@
   <img src="assets/gallery-dark.webp" alt="Driftglass 深色模式：悬浮玻璃侧栏和输入框浮在深青色流体背景上" width="100%">
 </p>
 
-*截图来自本项目在 DSH 0.2.1-rc.5 上的实际界面；DSH 自身文案跟随你的语言设置。*
+*截图来自本项目的实际界面；DSH 自身文案跟随你的语言设置。*
 
-Driftglass 是 [WYH66666666 的 Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) 的 fork，按 **DSH 0.2.1-rc.5** 重建。原版的材质系统完整保留；这个 fork 把它带进当前的 Harness：一个能安装的包、一层铺到页面边缘的背景、三块主面板共用的一套卡片语言，以及可以分别跟随浅色和深色的壁纸。
+Driftglass 是 [WYH66666666 的 Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) 的 fork，按 **DSH 0.2.2-rc.1** 重建。原版的材质系统完整保留；这个 fork 把它带进当前的 Harness：一个能安装的包、一层铺到页面边缘的背景、三块主面板共用的一套卡片语言，以及可以分别跟随浅色和深色的壁纸。
 
 ## 相对 v1.3.0 的改动
 
 | 方面 | 相对 v1.3.0 基线 |
 | --- | --- |
-| **DSH 0.2.1-rc.5** | 以独立包名重建，加入激活补丁和「通用设置」入口；安装与主题切换路径有回归测试。 |
+| **DSH 0.2.2-rc.1** | 适配重做后的通用设置（入口排在字号大小之后）和右侧工作台，右侧面板也变成同款玻璃卡片；安装与主题切换路径有回归测试。 |
 | **桌面背景** | 遮住流体/壁纸的不透明中栏没了：背景现在铺到悬浮卡片后面的页面边缘。 |
 | **主面板** | 定时任务页和插件管理页加入悬浮卡片家族。插件页保留自己的滚动容器和稳定的滚动条槽。 |
 | **壁纸** | 浅色和深色各自保存图片或视频，也各自有一套模糊、磨砂和亮度参数。 |
@@ -119,7 +119,7 @@ Chromium 可以记住视频文件的授权；其他浏览器会回落到本地�
 
 ### 要求
 
-- **DSH 0.2.1-rc.5 或更高，但低于 0.3.0**（manifest 声明 `>=0.2.1-rc.5 <0.3.0-0`），桌面端或网页端。已在 0.2.1-rc.5 上验证安装。
+- **DSH 0.2.2-rc.1 或更高，但低于 0.3.0**（manifest 声明 `>=0.2.2-rc.1 <0.3.0-0`），桌面端或网页端。已在 0.2.2-rc.1 上验证安装。
 - 用户机器不需要构建工具：编译好的客户端已提交在 `lib/`。
 - 只有开发才需要 Node.js 24。
 
@@ -165,7 +165,7 @@ dsh plugin --profile desktop add github:realhenrylan/DSH-Transparent-UI-Plugin#m
 
 | | |
 | --- | --- |
-| **DSH** | 0.2.1-rc.5 或更高，低于 0.3.0（`>=0.2.1-rc.5 <0.3.0-0`） |
+| **DSH** | 0.2.2-rc.1 或更高，低于 0.3.0（`>=0.2.2-rc.1 <0.3.0-0`） |
 | **宿主** | 桌面端和网页端 |
 | **浏览器** | 视频壁纸推荐 Chromium；其他浏览器回落到存储副本 |
 | **其他插件** | 兼容模式会把玻璃材质扩展到第三方界面 |

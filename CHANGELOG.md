@@ -1,9 +1,13 @@
 # Changelog
 
-## Unreleased
+## v1.5.0
 
+- Adapt to DSH 0.2.2-rc.1: require `>=0.2.2-rc.1 <0.3.0-0`, move Cordis to 4.1.0, and build against the 0.2.2-rc.1 client packages.
+- Register the Glass theme row at order 11.5 so the redesigned General section shows it directly under Font size and above the transcript-view rows; match the host's 16px row rhythm, 0.5px hairline, and right-aligned master switch.
+- Give DSH 0.2.2's new right workbench (`[data-rightbar-col]`) the same floating glass card as the sidebar; the old `detailsCol` seam never matched stock DSH.
+- Fix the scheme delete button color: `--dsw-alias-label-error` does not exist in the host themes, so use `--dsw-alias-state-error-primary`.
 - Rename the project and package to Driftglass (`dsh-driftglass`); the loader id, activation patch id, invariant strings, tests, installer, and READMEs follow, while the internal Aqua storage keys, document attributes, and CSS module names stay for compatibility with existing settings.
-- Widen `engines.dsh` from the single tested release to a SemVer range (`>=0.2.1-rc.5 <0.3.0-0`) per the packaging guide, so later 0.2.x releases and 0.3.0 stay installable; the manifest test now probes the range anchor-by-anchor and rejects 0.3.0 prereleases under naive SemVer implementations too.
+- Widen `engines.dsh` from a single tested release to a SemVer range per the packaging guide, so later 0.2.x releases and 0.3.0 stay installable; the manifest test now probes the range anchor-by-anchor and rejects 0.3.0 prereleases under naive SemVer implementations too.
 - Track `main` in the GitHub install reference so the renamed package installs from the repository; the READMEs explain how to pin a tag or commit when a frozen build is preferred.
 - Lock the client bundle's externalized-module surface with a manifest test: the built factory may ask the page loader only for `react`, `react/jsx-runtime`, and `@deepseek-ai/dsh-client-store` (the exact set official entries rely on); a guard also freezes the four reviewed inject edges so a non-entry package can never join the graph.
 - Set the whole UI in a serif CJK face: body copy, headings, the conversation tree, settings and markdown code blocks now share one CJK serif stack (Noto Serif SC, then Songti SC/STSong, SimSun); Latin/digits keep Space Grotesk and code blocks keep the host monospace.

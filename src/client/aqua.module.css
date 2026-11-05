@@ -67,6 +67,35 @@
   background: transparent;
 }
 
+/* ---------- Right workbench column: the floating glass card that mirrors the
+   sidebar. DSH renders the right panel (files / terminal / tools) into
+   layout's `[data-rightbar-col]`; its tab host paints an opaque base fill, so
+   the pane is lifted too — otherwise the card only frames a solid slab. The
+   seam is stamped at runtime (`data-dsh-details`). ---------- */
+[data-dsh-float] [data-dsh-details] {
+  margin: 8px 12px 12px 0;
+  border: 1px solid rgba(19, 45, 83, 0.26);
+  border-radius: 20px;
+  background: var(--dsh-aqua-glass-card-light);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 10px 34px rgba(19, 45, 83, 0.16);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
+  overflow: hidden;
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-dsh-details] {
+  border-color: rgba(148, 180, 220, 0.32);
+  background: var(--dsh-aqua-glass-card-dark);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 30px rgba(2, 6, 14, 0.32);
+}
+
+[data-dsh-float] [data-dsh-details] :is([class*='_tabHost_'], [class*='_pane_']) {
+  background: transparent;
+}
+
 /* The header card floats ABOVE the transcript: the scroll body slides up
    behind the frosted glass (negative margin) and its padding starts content
    below the card, so scrolling text passes under the header and stays

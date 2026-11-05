@@ -71,12 +71,11 @@ const satisfies = version => {
 test('the package declares a DSH engine range consistent with the install flow', () => {
   // Anchor versions: the installed-and-verified release, the first release that
   // follows it, and the boundaries just outside the range.
-  assert.equal(manifest.engines?.dsh, '>=0.2.1-rc.5 <0.3.0-0')
-  assert.equal(satisfies('0.2.1-rc.5'), true, 'the verified DSH release must satisfy the range')
-  assert.equal(satisfies('0.2.1'), true, 'the stable release must satisfy the range')
-  assert.equal(satisfies('0.2.2'), true, 'later 0.2.x releases must satisfy the range')
-  assert.equal(satisfies('0.2.1-rc.4'), false, 'older prereleases must not satisfy the range')
-  assert.equal(satisfies('0.2.0'), false, 'releases before the resolution fixes must not satisfy the range')
+  assert.equal(manifest.engines?.dsh, '>=0.2.2-rc.1 <0.3.0-0')
+  assert.equal(satisfies('0.2.2-rc.1'), true, 'the verified DSH release must satisfy the range')
+  assert.equal(satisfies('0.2.2'), true, 'the stable release must satisfy the range')
+  assert.equal(satisfies('0.2.2-rc.0'), false, 'older prereleases must not satisfy the range')
+  assert.equal(satisfies('0.2.1'), false, 'releases before the settings redesign must not satisfy the range')
   assert.equal(satisfies('0.3.0-rc.1'), false, '0.3.0 prereleases must not satisfy the range')
   assert.equal(satisfies('0.3.0'), false, '0.3.0 stable must not satisfy the range')
 })
@@ -108,6 +107,15 @@ test('the client factory registers under the package identity', () => {
   assert.equal(registered.id, manifest.name)
   assert.equal(typeof registered.factory, 'function')
   assert.equal(client.includes('@deepseek-ai/dsh-client-runtime/client'), false)
+})
+
+test('the client stamps the 0.2.2 right workbench seam', () => {
+  // 0.2.2 renders the right workbench as layout's `[data-rightbar-col]`; the
+  // pre-0.2.2 `detailsCol` class never existed in stock DSH. Keep the seam
+  // aligned with the panel the CSS actually decorates.
+  const client = readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+  assert.equal(client.includes('[data-rightbar-col]'), true)
+  assert.equal(client.includes('detailsCol'), false)
 })
 
 test('the client bundle externalizes only modules the page loader provides', () => {

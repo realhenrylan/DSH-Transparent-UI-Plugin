@@ -5,8 +5,8 @@ English | [中文](README.md)
 **Deep-sea glass for the DeepSeek Harness desktop and web UI.** Driftglass turns the shell into floating frosted panes over a living fluid backdrop — or over your own image or video wallpaper. It is a plugin: DSH's source stays untouched, and one switch puts the stock interface back.
 
 <p align="center">
-  <img alt="DSH 0.2.1-rc.5" src="https://img.shields.io/badge/DSH-0.2.1--rc.5-0f766e?style=flat-square">
-  <img alt="Version 1.4.2" src="https://img.shields.io/badge/version-1.4.2-0b3b4a?style=flat-square">
+  <img alt="DSH 0.2.2-rc.1" src="https://img.shields.io/badge/DSH-0.2.2--rc.1-0f766e?style=flat-square">
+  <img alt="Version 1.5.0" src="https://img.shields.io/badge/version-1.5.0-0b3b4a?style=flat-square">
   <img alt="AGPL-3.0 license" src="https://img.shields.io/badge/license-AGPL--3.0-0f766e?style=flat-square">
   <img alt="Desktop and Web" src="https://img.shields.io/badge/platform-Desktop%20%2B%20Web-134e4a?style=flat-square">
   <a href="https://github.com/deepseek-ai/deepseek-harness"><img alt="powered by dsh" src="https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white"></a>
@@ -16,15 +16,15 @@ English | [中文](README.md)
   <img src="assets/gallery-dark.webp" alt="Driftglass in dark mode: a floating glass sidebar and composer over a deep teal fluid backdrop" width="100%">
 </p>
 
-*Screenshots are from this project on DSH 0.2.1-rc.5. DSH's own copy follows your locale.*
+*Screenshots are from this project. DSH's own copy follows your locale.*
 
-Driftglass is the fork of [WYH66666666's Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) rebuilt for **DSH 0.2.1-rc.5**. The original material system is still here. The fork carries it into the current Harness: a package that installs, a backdrop that reaches the page edge, one card language on all three main panels, and wallpapers that can follow light and dark separately.
+Driftglass is the fork of [WYH66666666's Aqua v1.3.0](https://github.com/WYH66666666/DSH-Transparent-UI-Plugin) rebuilt for **DSH 0.2.2-rc.1**. The original material system is still here. The fork carries it into the current Harness: a package that installs, a backdrop that reaches the page edge, one card language on all three main panels, and wallpapers that can follow light and dark separately.
 
 ## What this fork changes
 
 | Area | Since the v1.3.0 baseline |
 | --- | --- |
-| **DSH 0.2.1-rc.5** | Rebuilt with its own package identity, activation patch and General-settings row. Installation and the theme switch are covered by regression tests. |
+| **DSH 0.2.2-rc.1** | Rebuilt for the redesigned General settings (the row sits right after Font size) and the new right workbench, which now shares the same glass card; installation and the theme switch are covered by regression tests. |
 | **Desktop backdrop** | The opaque center column is gone: the fluid or wallpaper now reaches the page edge behind the floating cards. |
 | **Main panels** | Scheduled tasks and the plugin manager join the floating-card family. The plugin page keeps its own scrollport and a stable scrollbar gutter. |
 | **Wallpapers** | Light and dark each keep their own image or video, plus their own blur, frost and brightness. |
@@ -119,7 +119,7 @@ Everything lives under **Settings → General → Appearance → Glass theme**. 
 
 ### Requirements
 
-- **DSH 0.2.1-rc.5 or later but below 0.3.0** (the manifest declares `>=0.2.1-rc.5 <0.3.0-0`), Desktop or Web. Install-verified on 0.2.1-rc.5.
+- **DSH 0.2.2-rc.1 or later but below 0.3.0** (the manifest declares `>=0.2.2-rc.1 <0.3.0-0`), Desktop or Web. Install-verified on 0.2.2-rc.1.
 - No build tools on the user machine: the compiled client in `lib/` is committed.
 - Node.js 24 only for development.
 
@@ -165,7 +165,7 @@ Open **Settings → General → Appearance**. The master switch sits under **Gla
 
 | | |
 | --- | --- |
-| **DSH** | 0.2.1-rc.5 or later, below 0.3.0 (`>=0.2.1-rc.5 <0.3.0-0`) |
+| **DSH** | 0.2.2-rc.1 or later, below 0.3.0 (`>=0.2.2-rc.1 <0.3.0-0`) |
 | **Hosts** | Desktop and Web |
 | **Browsers** | Chromium recommended for video wallpapers; other browsers fall back to a stored copy |
 | **Other plugins** | Compatibility mode extends the glass material to third-party surfaces |

@@ -8,8 +8,8 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 8px 0 16px;
-  border-bottom: 1px solid var(--dsw-alias-border-l2);
+  padding: 16px 0;
+  border-bottom: 0.5px solid var(--dsw-alias-border-l2);
 }
 
 /* One titled sub-group: title over its control stack. */
@@ -40,12 +40,26 @@
   gap: 10px;
 }
 
+/* Master row: the plugin title heads the group and its switch parks on the
+ * same right edge as the host's own row controls (font-size dropdown etc.). */
+.masterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.masterRow .rowLabel {
+  width: auto;
+  flex: 1 1 auto;
+}
+
 .rowLabel {
   flex: none;
   width: 92px;
-  font-size: 12px;
-  line-height: 18px;
-  color: var(--dsw-alias-label-secondary);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--dsw-alias-label-primary);
 }
 
 /* Short inline label next to a second toggle in the same row (critters). */
@@ -240,7 +254,7 @@
   background: transparent;
   font-size: 12px;
   line-height: 18px;
-  color: var(--dsw-alias-label-error);
+  color: var(--dsw-alias-state-error-primary);
   cursor: pointer;
 }
 

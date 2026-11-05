@@ -154,7 +154,10 @@ export function apply(ctx: ClientContext): void {
   ctx.slots.inject('settings.general.item', () => ctx.slots.register({
     name: 'settings.general.item',
     id: 'aqua',
-    order: 11,
+    // 0.2.2 ships appearance at 10, font-size at 11 and the transcript-view
+    // group at 12; 11.5 keeps this row directly under the font row without
+    // tying either host registration (ties fall back to plugin load order).
+    order: 11.5,
     store: appearanceStore,
     locale: NS,
     inject: appearanceInjected,
