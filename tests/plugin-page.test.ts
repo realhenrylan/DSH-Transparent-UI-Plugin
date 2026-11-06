@@ -31,15 +31,35 @@ function mount(): HTMLElement {
   document.head.innerHTML = `
     <style>section[data-plugin-panel] { border: 0; border-radius: 0; margin: 0; }</style>
     <style>${aquaCss}</style>`
+  // The real markup: the title row lives inside the scrollable page body's
+  // sticky bar (pageBody > pageBar > header), NOT directly under the section.
+  // Pinning the real nesting is the point of this test — an earlier fixture
+  // had the header as a direct child, so the flatten rule passed here while
+  // the app still painted a detached header card.
   document.body.innerHTML = `
     <div data-dsh-frame>
       <div class="host_centerCol">
         <section data-plugin-panel>
-          <header data-window-drag><h1>Plugins</h1></header>
+          <div class="host_pageBody" data-plugin-body>
+            <div class="host_pageBar" data-plugin-bar>
+              <header class="host_pageHead" data-window-drag>
+                <div class="host_pageHeading"><h1>Plugins</h1></div>
+              </header>
+            </div>
+          </div>
         </section>
       </div>
     </div>`
   return document.querySelector('section[data-plugin-panel]')!
+}
+
+/** The "more" list is the one view whose header IS a direct child. */
+function mountMore(): HTMLElement {
+  mount()
+  const section = document.querySelector('section[data-plugin-panel]')!
+  section.innerHTML = `
+    <header class="host_moreHead" data-window-drag><h1>More plugins</h1></header>`
+  return section
 }
 
 afterEach(() => {
@@ -78,16 +98,49 @@ describe('plugin manager page card', () => {
   it('flattens the page title header onto the card', () => {
     const page = mount()
     const header = page.querySelector('header')!
+    expect(header.className).toBe('host_pageHead')
     const style = getComputedStyle(header)
     expect(style.marginTop).toBe('0px')
     expect(style.borderTopWidth).toBe('0px')
     expect(style.borderRadius).not.toBe('20px')
     expect(style.boxShadow).toBe('none')
 
-    const rule = declarationsOf('[data-dsh-float] section[data-plugin-panel] > header {')
+    const rule = declarationsOf('[data-dsh-float] section[data-plugin-panel] header {')
     expect(rule).toMatch(/background:\s*transparent/)
     expect(rule).toMatch(/backdrop-filter:\s*none/)
     expect(rule).toMatch(/padding:\s*calc\(28px \+ var\(--dsh-frame-top-clearance/)
+  })
+
+  it('flattens the "more" list header that sits directly under the section', () => {
+    const header = mountMore().querySelector('header')!
+    expect(header.className).toBe('host_moreHead')
+    const style = getComputedStyle(header)
+    expect(style.marginTop).toBe('0px')
+    expect(style.borderTopWidth).toBe('0px')
+    expect(style.boxShadow).toBe('none')
+  })
+
+  it('keeps the sticky title band clear while the list is at its top', () => {
+    const rest = declarationsOf('[data-dsh-float] section[data-plugin-panel] [data-plugin-bar]::before {')
+    expect(rest).toMatch(/background:\s*transparent/)
+    expect(rest).toMatch(/backdrop-filter:\s*none/)
+  })
+
+  it('frosts the band over the card material once the list scrolls', () => {
+    const scrolled = declarationsOf(
+      '[data-dsh-float] section[data-plugin-panel] [data-plugin-bar][data-scrolled]::before {'
+    )
+    expect(scrolled).toMatch(/background:\s*var\(--dsh-aqua-glass-sticky-light\)/)
+    expect(scrolled).toMatch(/backdrop-filter:\s*blur\(calc\(var\(--dsh-aqua-blur, 14px\) \* 2\)\)/)
+
+    const dark = declarationsOf(
+      '[data-dsh-float] body[data-ds-dark-theme] section[data-plugin-panel] [data-plugin-bar][data-scrolled]::before {'
+    )
+    expect(dark).toMatch(/background:\s*var\(--dsh-aqua-glass-sticky-dark\)/)
+
+    const tokens = declarationsOf('[data-dsh-aqua] {')
+    expect(tokens).toMatch(/--dsh-aqua-glass-sticky-light:/)
+    expect(tokens).toMatch(/--dsh-aqua-glass-sticky-dark:/)
   })
 
   it('switches the card to the dark glass fill', () => {

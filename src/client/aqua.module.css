@@ -50,6 +50,10 @@
   /* Dark glass is a NEUTRAL cool gray, not blue: raising frost to max would
      otherwise reveal the blue base and read as a blue slab in dark mode. */
   --dsh-aqua-glass-card-dark: color-mix(in srgb, rgb(34 38 47) calc(50% * var(--dsh-aqua-frost, 1)), transparent);
+  /* Sticky title bands sit ON a card and must hide rows scrolling beneath
+     them, so they are denser than the card fill they frost over. */
+  --dsh-aqua-glass-sticky-light: color-mix(in srgb, rgb(255 255 255) calc(88% * var(--dsh-aqua-frost, 1)), transparent);
+  --dsh-aqua-glass-sticky-dark: color-mix(in srgb, rgb(34 38 47) calc(88% * var(--dsh-aqua-frost, 1)), transparent);
 }
 
 [data-dsh-aqua] [data-dsh-frame] {
@@ -869,11 +873,14 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
 }
 
 /* The global session-header card above also matches the plugin page's title
-   rows: both the main list and the "more" list use a plain <header>. Without
-   this override the card gets sliced twice — a detached header bar sitting
-   inside the page card. Flatten those rows back onto the page and restore
-   their stock top padding (the shell uses it to clear the titlebar). */
-[data-dsh-float] section[data-plugin-panel] > header {
+   rows: both the main list and the "more" list use a plain <header>. On the
+   main list the markup is pageBody > pageBar > header, so the row is a
+   DESCENDANT of the section (only the "more" list nests its header directly
+   under the section) — matching descendants covers both. Without this the
+   card gets sliced twice — a detached header bar sitting inside the page card,
+   which is the blank band users see above the title. Flatten those rows back
+   onto the page and restore their stock top padding. */
+[data-dsh-float] section[data-plugin-panel] header {
   margin: 0;
   padding: calc(28px + var(--dsh-frame-top-clearance, 0px)) 0 0;
   border: 0;
@@ -881,6 +888,27 @@ html[data-dsh-float][data-dsh-aqua-wallpaper][data-dsh-aqua-media='video'] body[
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
+}
+
+/* The title row is sticky (pageBar[data-natural]) and DSH paints an opaque
+   canvas-colored band behind it — a solid rectangle at the header's rest
+   height, so at the top of the page it reads as a blank strip on the glass.
+   Keep the band clear while the list is at its top, and let it frost with the
+   card material only once rows are actually sliding underneath. */
+[data-dsh-float] section[data-plugin-panel] [data-plugin-bar]::before {
+  background: transparent;
+  backdrop-filter: none;
+}
+
+[data-dsh-float] section[data-plugin-panel] [data-plugin-bar][data-scrolled]::before {
+  background: var(--dsh-aqua-glass-sticky-light);
+  /* Twice the card blur: row text that slides under the band must stop being
+     legible, or the "frosted" strip reads as broken translucency. */
+  backdrop-filter: blur(calc(var(--dsh-aqua-blur, 14px) * 2));
+}
+
+[data-dsh-float] body[data-ds-dark-theme] section[data-plugin-panel] [data-plugin-bar][data-scrolled]::before {
+  background: var(--dsh-aqua-glass-sticky-dark);
 }
 
 /* ---------- Stats line: the composer card's docked footer (original
