@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Stop the composer hover press from shoving the transcript column upward. The press scales its pane by 1.01, and the composer slab is as wide as the content column, so its right edge painted ~5px past the transcript scrollport. A transform counts toward the scrollable overflow region, so the stock `overflow-y: auto` grew a horizontal scrollbar; the bar took ~5px off `clientHeight`, and since the slab is laid against the container's bottom edge the whole column jumped up 5px in a single frame. That is a layout change, which no CSS transition can interpolate. The scrollport now sets `overflow-x: clip`, so the axis cannot scroll and the height never changes. The press itself is untouched: scale, rotation, glow and the recess all stay.
+
 ## v1.5.0
 
 - Adapt to DSH 0.2.2-rc.1: require `>=0.2.2-rc.1 <0.3.0-0`, move Cordis to 4.1.0, and build against the 0.2.2-rc.1 client packages.

@@ -140,6 +140,23 @@
    the composer card's `backdrop-filter` (the "send bar won't blur what's
    behind it" bug) —content scrolls behind it sharp instead of frosted. */
 
+/* No horizontal scrollbar on the transcript scrollport.
+   The hover press scales the composer slab by 1.01, and the slab is as wide
+   as the content column, so its right edge paints ~5px past the scrollport.
+   A transform counts toward the scrollable overflow region, so the stock
+   `overflow-y: auto` (which leaves the x axis computing to auto) grew a
+   horizontal scrollbar; the bar took ~5px off clientHeight, and since the
+   slab is laid against the container's bottom edge the whole column jumped up
+   5px in one frame. A layout change is not interpolatable, so no transition
+   could smooth it.
+   `clip` forbids scrolling on this axis outright (unlike `hidden`, which
+   still allows programmatic scrolling — focusing the textarea could then
+   shift the column sideways). Nothing in the transcript ever scrolls
+   sideways; the overflow is purely the painted transform. */
+[data-dsh-aqua][data-dsh-float] [data-conversation-scroll] {
+  overflow-x: clip;
+}
+
 /* Active phase: drop the composer seat's opaque bottom slab and its 36px
    fade band entirely —the base rule (`.root[data-phase='active']
    .composerSeat`) is (0,3,0), so the doubled attribute selector below must
