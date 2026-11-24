@@ -75,29 +75,79 @@
    sidebar. DSH renders the right panel (files / terminal / tools) into
    layout's `[data-rightbar-col]`; its tab host paints an opaque base fill, so
    the pane is lifted too — otherwise the card only frames a solid slab. The
-   seam is stamped at runtime (`data-dsh-details`). ---------- */
+   seam is stamped at runtime (`data-dsh-details`).
+
+   The inset is 12px on all four sides, the same rhythm as the sidebar card:
+   the column is a grid track, so a missing left margin left the card welded
+   to the centre column while the other panels floated free.
+
+   The glass lives on ::before here too, for the same two reasons as the
+   sidebar and the composer: a `backdrop-filter` on the element makes it the
+   backdrop root of its own contents (the pane's tab view can no longer frost
+   the transcript behind it) and the containing block of every `position:
+   fixed` descendant — the dockkit floating pane is exactly that, so a lifted
+   tab used to be re-anchored into the card. `isolation: isolate` gives the
+   z-index -1 glass and glow a stacking context to sit in. ---------- */
 [data-dsh-float] [data-dsh-details] {
-  margin: 8px 12px 12px 0;
+  position: relative;
+  margin: 12px;
   border: 1px solid rgba(19, 45, 83, 0.26);
   border-radius: 20px;
-  background: var(--dsh-aqua-glass-card-light);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 10px 34px rgba(19, 45, 83, 0.16);
-  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
+  isolation: isolate;
+  background: transparent;
+  box-shadow: 0 10px 34px rgba(19, 45, 83, 0.16);
+  backdrop-filter: none;
   overflow: hidden;
+}
+
+[data-dsh-float] [data-dsh-details]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--dsh-aqua-glass-card-light);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
 }
 
 [data-dsh-float] body[data-ds-dark-theme] [data-dsh-details] {
   border-color: rgba(148, 180, 220, 0.32);
+  box-shadow: 0 8px 30px rgba(2, 6, 14, 0.32);
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-dsh-details]::before {
   background: var(--dsh-aqua-glass-card-dark);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 8px 30px rgba(2, 6, 14, 0.32);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 [data-dsh-float] [data-dsh-details] :is([class*='_tabHost_'], [class*='_pane_']) {
   background: transparent;
+}
+
+/* The docked pane fills the card's INNER box instead of the column's border
+   box. The host draws it as an absolutely positioned canvas pinned to
+   right/top/bottom with an inline pixel width taken from the grid track, so
+   without this the tab strip and its scroll body sit flush against the glass
+   edge — the workbench card had none of the 10/12px breathing room the
+   sidebar and header cards give their content. `width: auto` lets the
+   element track the inset box; the inline `--dsh-sidebar-width` keeps the
+   open/close slide measured against the full track, so the panel still
+   clears the card completely when it runs away. Fullscreen keeps its own
+   viewport-sized geometry. */
+[data-dsh-float] [data-dsh-details] [data-sidebar-right-panel='push'] {
+  width: auto !important;
+  inset: 10px 12px 12px;
+}
+
+/* The kit draws a hairline on the LEFT edge of the first docked column, to
+   separate it from the pane beside it in the stock three-track layout. Once
+   the pane is inset inside the glass card there is nothing to its left but
+   the card's own border, so the hairline lands a dozen pixels inside the
+   glass and reads as an extra column. The card border already draws that
+   edge. Scoped to the docked panel, like the inset above. */
+[data-dsh-float] [data-dsh-details] [data-sidebar-right-panel='push'] [data-dockkit-host='dock'][data-dockkit-column='0'] > :is([class*='_tabHost_'], [class*='_emptyTabHost_']) {
+  border-left: 0;
 }
 
 /* The header card floats ABOVE the transcript: the scroll body slides up

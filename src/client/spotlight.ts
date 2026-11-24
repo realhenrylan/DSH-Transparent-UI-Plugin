@@ -67,6 +67,17 @@ const SETTLE_MS = 240
  */
 const SIDEBAR_COLUMN = '[class*="sidebarCol"]'
 
+/**
+ * The right workbench card's seam. It can host the dockkit floating pane,
+ * which the kit draws with `position: fixed` and positions from its own drag
+ * math — the same trap as the sidebar, so a pane carrying one takes the glow
+ * alone. See `tiltable`.
+ */
+const RIGHTBAR_COLUMN = '[data-dsh-details]'
+
+/** A floated dockkit pane, fixed-positioned inside whichever card hosts it. */
+const FLOATING_PANE = '[data-dockkit-host="float"]'
+
 /** The glow is live only while its gate attribute is on <html>. */
 function glowGated(): boolean {
   return document.documentElement.hasAttribute(SPOTLIGHT_ATTRIBUTE)
@@ -93,6 +104,11 @@ function tiltable(spot: HTMLElement): boolean {
   // the panel traps at the column width and the titlebar buttons jump out of
   // the window chrome. The glow is the only effect the sidebar takes part in.
   if (spot.matches(SIDEBAR_COLUMN)) return false
+  // The workbench card tilts like the other glass, with one exception: a
+  // floated dockkit pane is `position: fixed` and lives inside it, so a live
+  // transform would re-anchor that pane into the card. It only mounts while
+  // the operator tears a tab out, so the card stands still exactly then.
+  if (spot.matches(RIGHTBAR_COLUMN) && spot.querySelector(FLOATING_PANE) !== null) return false
   return true
 }
 
@@ -264,16 +280,19 @@ export function startSpotlight(): () => void {
   // The glow divs live with the panes through React re-renders; DOM/layout
   // changes also refresh the active hover session (coalesced).
   const keeper = startOverlayKeeper(() => {
-    // The settings dialog mounts INSIDE the sidebar column. The sidebar never
-    // tilts (see `tiltable`), but a transform left behind by an earlier build,
-    // a hot reload or a race would trap the panel's fixed overlay in the
-    // column — so it is dropped with a SNAP, not a glide: removing the inline
-    // transform while the CSS transition is live would keep the COMPUTED
-    // transform alive for ~0.1s and re-trap the panel for those frames.
-    // Disabling the transition around the removal makes the release instant.
+    // Two panes host a `position: fixed` guest that mounts later than the
+    // pane itself: the sidebar column carries the settings dialog, the
+    // workbench card carries a dockkit floated pane. Neither tilts (see
+    // `tiltable`), but a transform left behind by an earlier build, a hot
+    // reload or a race would trap the guest inside the card — so it is
+    // dropped with a SNAP, not a glide: removing the inline transform while
+    // the CSS transition is live would keep the COMPUTED transform alive for
+    // ~0.1s and re-trap the guest for those frames. Disabling the transition
+    // around the removal makes the release instant.
     for (const spot of spotElements()) {
-      if (!spot.matches(SIDEBAR_COLUMN)) continue
-      if (spot.querySelector('[role="dialog"]') === null) continue
+      const dialog = spot.matches(SIDEBAR_COLUMN) && spot.querySelector('[role="dialog"]') !== null
+      const floated = spot.matches(RIGHTBAR_COLUMN) && spot.querySelector(FLOATING_PANE) !== null
+      if (!dialog && !floated) continue
       spot.removeAttribute(ON_ATTR)
       const id = settle.get(spot)
       if (id !== undefined) {

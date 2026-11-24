@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Add the right workbench card to the spotlight panes: the cursor glow and the hover press now reach it, matching the sidebar, the header and the composer. The card had a glass surface but was never stamped with the `data-dsh-aqua-spot` seam the two effects key off, so it stayed inert while every other pane answered the pointer.
+- The card stands still while a dockkit pane is torn out of it: that pane is `position: fixed` and lives inside the card, so a live transform would re-anchor it, the same reason the sidebar never tilts.
+- Move the workbench glass onto `::before`, like the sidebar and the composer. A `backdrop-filter` on the card made it the backdrop root of its own contents and the containing block of the floated pane.
+- Inset the workbench card 12px on all four sides (it had 8px top and no left margin), and inset the docked pane 10/12px inside it. The pane is an absolutely positioned canvas pinned to the column track with an inline pixel width, so its tab strip and scroll body sat flush against the glass edge while the sidebar and header kept their padding.
+- Drop the kit's `border-left` on the first docked column. It separates columns in the stock layout; inside the inset card there is nothing to its left but the card border, so the hairline landed inside the glass and read as an extra column.
+
 ## v1.5.0
 
 - Adapt to DSH 0.2.2-rc.1: require `>=0.2.2-rc.1 <0.3.0-0`, move Cordis to 4.1.0, and build against the 0.2.2-rc.1 client packages.

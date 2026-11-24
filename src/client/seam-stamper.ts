@@ -53,6 +53,9 @@ const SEAMS: readonly Seam[] = [
   { attribute: 'data-dsh-aqua-spot', selector: '[class*="sidebarCol"]', first: true },
   { attribute: 'data-dsh-aqua-spot', selector: '[data-dsh-inputbar]' },
   { attribute: 'data-dsh-aqua-spot', selector: '[data-dsh-trajectory]' },
+  // The right workbench card: the third floating pane, so it takes the same
+  // cursor glow and press as the other two. Stamped after the details seam.
+  { attribute: 'data-dsh-aqua-spot', selector: '[data-dsh-details]', first: true },
   { attribute: 'data-dsh-aqua-spot', selector: '[data-dsh-surface]' },
   // The sidebar wordmark button (its badge plate gets the official pill).
   { attribute: 'data-dsh-wordmark', selector: '[class*="sidebarCol"] [class*="brand"]', first: true },
